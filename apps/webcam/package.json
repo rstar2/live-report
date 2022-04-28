@@ -1,0 +1,25 @@
+{
+  "name": "webcam",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "dev": "ts-node ./src/index.ts",
+    "start": "NODE=production node ./dist/index.js",
+    "lint": "eslint . --fix"
+  },
+  "dependencies": {
+    "log4js": "^6.4.6",
+    "node-cron": "^3.0.0",
+    "strip-ansi": "^7.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.29",
+    "config": "*",
+    "ts-node": "^10.7.0",
+    "tsconfig": "*",
+    "typescript": "^4.6.3"
+  }
+}

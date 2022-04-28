@@ -3,5 +3,9 @@
         "activityBar.background": "#2F284F",
         "titleBar.activeBackground": "#42386E",
         "titleBar.activeForeground": "#FBFBFD"
-    }
+    },
+    "cSpell.words": [
+        "turborepo",
+        "Vite"
+    ]
 }
