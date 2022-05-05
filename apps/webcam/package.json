@@ -1,13 +1,15 @@
 {
-  "name": "webcam",
+  "name": "live-report-webcam",
   "version": "1.0.0",
   "private": true,
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "build": "tsc",
+    "dev:watch": "nodemon",
     "dev": "ts-node ./src/index.ts",
-    "start": "NODE=production node ./dist/index.js",
+    "start": "NODE_ENV=production node ./dist/index.js",
     "lint": "eslint . --fix"
   },
   "dependencies": {
@@ -16,10 +18,21 @@
     "strip-ansi": "^7.0.1"
   },
   "devDependencies": {
+    "@types/dotenv-safe": "^8.1.2",
+    "@types/jest": "^27.4.1",
     "@types/node": "^17.0.29",
     "config": "*",
+    "dotenv-safe": "^8.2.0",
+    "jest": "^27.5.1",
+    "nodemon": "^2.0.15",
+    "ts-jest": "^27.1.4",
     "ts-node": "^10.7.0",
     "tsconfig": "*",
     "typescript": "^4.6.3"
+  },
+  "comments": {
+    "// dotenv-safe": "same as dotenv package but more safe as it uses '.env.example' file to validate existance of reach defined env-variable",
+    "// nodemon": "makes development easier - restarts on each file change",
+    "// ts-jest": "allows using Jest with TypeScript files - uses the 'jest.config.js' file"
   }
 }

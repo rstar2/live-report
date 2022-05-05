@@ -1,0 +1,18 @@
+{
+    "-watch-comment": "in which folder(s) to watch for changes",
+    "watch": ["src"],
+
+    "-ext-comment": "for which file extensions only, e.g can be used to retrict to not watch for all possible files",
+    "ext": "ts, js, json",
+
+    "-restartable-comment": "The command, eg. just keys that can be typed to force restart",
+    "restartable": "rs",
+
+    "-exec-comment": "the command that nodemon will execute",
+    "exec": "npm run dev",
+    
+    "-env-comment": "the environment variables",
+    "env": {
+        "NODE_ENV": "development"
+    }
+}

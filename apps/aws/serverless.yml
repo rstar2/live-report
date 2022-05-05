@@ -1,0 +1,173 @@
+service: my-live-report
+
+frameworkVersion: '3'
+
+custom:
+  # the 'my-live-report' S3Bucket is explicitly created from the AWS Console
+  uploadBucketArn: arn:aws:s3:::my-live-report
+  uploadBucketgatewayArn: arn:aws:s3:::my-live-report
+
+  # set a global value for all functions
+  # values from http://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutRetentionPolicy.html
+  logRetentionInDays: 14
+
+package:
+  include:
+    - ".env.*"
+
+plugins:
+  - serverless-plugin-typescript 
+  - serverless-offline
+  # this will include only the dependencies that are used,
+  # other options are serverless-webpack or serverless-bundle that produce a single file
+  # https://github.com/AnomalyInnovations/serverless-typescript-starter
+  - serverless-plugin-include-dependencies
+  # customize the log retantion for all or individual functions
+  - serverless-plugin-log-retention
+
+provider:
+  name: aws
+  profile: serverless-cli
+
+  runtime: nodejs14.x
+
+  region: eu-west-1
+  stage: development
+
+  environment:
+    NODE_ENV: ${sls:stage}
+    # same as 
+    # NODE_ENV: ${self:provider.stage}
+
+  iamRoleStatements:
+    # all the Lambda Function(s) to access the specific S3 Bucket
+    - Effect: "Allow"
+      Action:
+        - "s3:ListBucket"
+      Resource: ${self:custom.uploadBucketArn}
+    - Effect: "Allow"
+      Action:
+        - "s3:PutObject"
+        - "s3:GetObject"
+      Resource: ${self:custom.uploadBucketArn}
+
+  # logs:
+  #   # Enable REST API logs
+  #   # This can either be set to `restApi: true` to use defaults, or configured via subproperties
+  #   # Can only be configured if the API is created by Serverless Framework
+  #   restApi:
+  #     # Enables HTTP access logs (default: true)
+  #     accessLogging: true
+  #     # Log format to use for access logs
+  #     format: 'requestId: $context.requestId'
+  #     # Enable execution logging (default: true)
+  #     executionLogging: true
+  #     # Log level to use for execution logging: INFO or ERROR
+  #     level: INFO
+  #     # Log full requests/responses for execution logging (default: true)
+  #     fullExecutionData: true
+  #     # Existing IAM role to use for API Gateway when writing CloudWatch Logs (default: automatically created)
+  #     # role: arn:aws:iam::123456:role
+  #     # Whether the API Gateway CloudWatch Logs role setting is not managed by Serverless (default: false)
+  #     # roleManagedExternally: false  
+
+functions:
+  config:
+    handler: src/functions/config/lambda.handler
+    # the simpler and newest 'Lambda Function URL'
+    # https://www.serverless.com/blog/aws-lambda-function-urls-with-serverless-framework
+    # https://aws.amazon.com/blogs/aws/announcing-aws-lambda-function-urls-built-in-https-endpoints-for-single-function-microservices/
+    url: true
+    logRetentionInDays: 30
+
+  express:
+    handler: src/functions/nestjs/lambda.handler
+    # this will be a full Nest.js app 
+    events:
+      - http:
+         method: ANY
+         path: /
+      - http: 
+         method: ANY
+         path: '{proxy+}'
+
+# NOTE!  I could not create the ApiGateway dynamimcally to be integrsated to the bucket
+#        so will create the Policy, Role, S3Bucket, ApiGateway explictly from the AWS Console.
+#        The Role (with the Policy) is used to allow the ApiGateway to put objects to the S3Bucket
+# NOTE!! After adding/removeing/updating any Resource/Method in the ApiGateway
+#        then in order to take effect it has to be (re)deployed (.g. click Actions->DeployAPI->Save)
+# Some simple example in https://bluegrid.io/using-rest-api-to-upload-files-to-the-s3-bucket/
+
+# resources:
+#   Resources:
+#     # The Bucket for uploaded images/videos
+#     UploadBucket:
+#       Type: AWS::S3::Bucket
+#       Properties:
+#         BucketName: ${self:service}-${self:provider.stage}
+
+
+#     # https://raw.githubusercontent.com/lalcebo/json-schema/master/serverless/reference.json
+#     # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-method.html#aws-resource-apigateway-method--examples
+#     UploadBucketApiGateway:
+#       Type: AWS::ApiGateway::RestApi
+#       Properties:
+#         Name: ${self:service}-${self:provider.stage}
+#         BinaryMediaTypes:
+#           - "*/*"
+#     # UploadBucketApiGatewayDeployment:
+#     #   Type: AWS::ApiGateway::Deployment
+#     #   Properties:
+#     #     RestApiId: !Ref UploadBucketApiGateway
+#     #     StageName: ${self:provider.stage}
+#     # UploadBucketApiGatewayStage:
+#     #   Type: AWS::ApiGateway::Stage
+#     #   Properties:
+#     #     RestApiId: !Ref UploadBucketApiGateway
+#     #     StageName: ${self:provider.stage}
+#     #     DeploymentId: !Ref UploadBucketApiGatewayDeployment
+#     UploadBucketApiGatewayResourceVideos:
+#       Type: AWS::ApiGateway::Resource
+#       Properties:
+#         RestApiId: !Ref UploadBucketApiGateway
+#         # ParentId: { "Fn::GetAtt": ["UploadBucketApiGateway", "RootResourceId"] }
+#         ParentId: !GetAtt UploadBucketApiGateway.RootResourceId
+#         PathPart: videos
+#     UploadBucketApiGatewayResourceVideoItem:
+#       Type: AWS::ApiGateway::Resource
+#       Properties:
+#         RestApiId: !Ref UploadBucketApiGateway
+#         # ParentId: { "Fn::GetAtt": ["UploadBucketApiGateway", "RootResourceId"] }
+#         ParentId: !Ref UploadBucketApiGatewayResourceVideos
+#         PathPart: "{image}"
+#     UploadBucketApiGatewayResourceImages:
+#       Type: AWS::ApiGateway::Resource
+#       Properties:
+#         RestApiId: !Ref UploadBucketApiGateway
+#         ParentId: !GetAtt UploadBucketApiGateway.RootResourceId
+#         PathPart: images
+#     UploadBucketApiGatewayResourceImageItem:
+#       Type: AWS::ApiGateway::Resource
+#       Properties:
+#         RestApiId: !Ref UploadBucketApiGateway
+#         ParentId: !Ref UploadBucketApiGatewayResourceImages
+#         PathPart: "{image}"
+#     UploadBucketApiGatewayMethodVideoItem:
+#       Type: AWS::ApiGateway::Method
+#       Properties:
+#         RestApiId: !Ref UploadBucketApiGateway
+#         ResourceId: !Ref UploadBucketApiGatewayResourceVideoItem
+#         HttpMethod: PUT
+#         AuthorizationType: NONE
+#         # Integration:
+#         #   Type: AWS
+#         #   IntegrationHttpMethod: PUT
+#         #   Uri:  xxxxx
+#     UploadBucketApiGatewayMethodImageItem:
+#       Type: AWS::ApiGateway::Method
+#       Properties:
+#         RestApiId: !Ref UploadBucketApiGateway
+#         ResourceId: !Ref UploadBucketApiGatewayResourceImageItem
+#         HttpMethod: PUT
+#         AuthorizationType: NONE
+#         # Integration:
