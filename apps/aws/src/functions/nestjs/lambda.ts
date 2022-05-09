@@ -4,7 +4,7 @@ import serverlessExpress from "@vendia/serverless-express";
 import { Handler } from "aws-lambda";
 import express from "express";
 
-import { AppModule } from "./app.module";
+import { AppModule } from "./server/app.module";
 
 let cachedServer: Handler;
 

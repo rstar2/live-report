@@ -1,10 +1,20 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+
 import "./index.css";
+
+import { routes } from "./routes";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <App />
+    <Router>
+      <Switch>
+        {routes.map(({ path, component: Component = React.Fragment }) => (
+          <Route key={path} path={path} component={Component} exact={true} />
+        ))}
+        {/* <Route path="*" component={NotFound} /> */}
+      </Switch>
+    </Router>
   </React.StrictMode>
 );
