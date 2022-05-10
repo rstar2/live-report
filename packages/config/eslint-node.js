@@ -11,7 +11,7 @@ module.exports = {
     jest: true,
   },
   rules: {
-    "no-console": "error",
+    "no-console": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
     "prettier/prettier": "error",
 

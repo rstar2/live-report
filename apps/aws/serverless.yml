@@ -4,8 +4,9 @@ frameworkVersion: '3'
 
 custom:
   # the 'my-live-report' S3Bucket is explicitly created from the AWS Console
-  uploadBucketArn: arn:aws:s3:::my-live-report
-  uploadBucketgatewayArn: arn:aws:s3:::my-live-report
+  uploadBucket: ${env:UPLOAD_BUCKET}
+  uploadBucketArn: arn:aws:s3:::${self:custom.uploadBucket}
+  uploadBucketGatewayUrl: ${env:UPLOAD_BUCKET_GATEWAY_URL}
 
   # set a global value for all functions
   # values from http://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutRetentionPolicy.html
@@ -13,7 +14,9 @@ custom:
 
 package:
   include:
-    - ".env.*"
+    - ".env.example"
+    - ".env.${sls:stage, 'development'}"
+    - "src/functions/nestjs/client"
 
 plugins:
   - serverless-plugin-typescript 
@@ -25,6 +28,8 @@ plugins:
   # customize the log retantion for all or individual functions
   - serverless-plugin-log-retention
 
+useDotenv: true  
+
 provider:
   name: aws
   profile: serverless-cli
@@ -35,21 +40,25 @@ provider:
   stage: development
 
   environment:
-    NODE_ENV: ${sls:stage}
+    NODE_ENV: ${sls:stage, 'development'}
     # same as 
     # NODE_ENV: ${self:provider.stage}
 
+    # the whole .env.xxx files are packed so use 'dotenv' inside each function to load itthe one it needs
+    # only the NODE_ENV is obligatory
+    # UPLOAD_BUCKET: ${self:custom.uploadBucket}
+    # UPLOAD_BUCKET_GATEWAY_URL: ${self:custom.uploadBucketGatewayUrl}
+
   iamRoleStatements:
-    # all the Lambda Function(s) to access the specific S3 Bucket
+    # all the Lambda Function(s) to access the specific S3 Bucket (only read permimssions)
     - Effect: "Allow"
       Action:
         - "s3:ListBucket"
       Resource: ${self:custom.uploadBucketArn}
     - Effect: "Allow"
       Action:
-        - "s3:PutObject"
         - "s3:GetObject"
-      Resource: ${self:custom.uploadBucketArn}
+      Resource: ${self:custom.uploadBucketArn}/*
 
   # logs:
   #   # Enable REST API logs

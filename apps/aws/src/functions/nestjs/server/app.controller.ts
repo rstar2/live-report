@@ -7,11 +7,16 @@ export class AppController {
 
   @Get("api")
   getApiRoot(): string {
-    return "root";
+    return JSON.stringify(process.env);
   }
 
-  @Get("api/hello")
-  getApiHello(): string {
-    return this.appService.getHello();
+  @Get("api/videos")
+  async getApiVideos(): Promise<any> {
+    return this.appService.getVideos();
+  }
+
+  @Get("api/images")
+  async getApiImages(): Promise<any> {
+    return this.appService.getImages();
   }
 }
