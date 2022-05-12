@@ -1,14 +1,25 @@
 import { Injectable } from "@nestjs/common";
 
-import { S3Client, ListObjectsV2Command, ListObjectsV2CommandInput } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  GetObjectCommand,
+  GetObjectCommandInput,
+  ListObjectsV2Command,
+  ListObjectsV2CommandInput,
+} from "@aws-sdk/client-s3";
 
 const S3 = new S3Client({ region: process.env.AWS_REGION });
 
 console.log("Bucket: ", process.env.UPLOAD_BUCKET);
-const params: ListObjectsV2CommandInput = {
+const paramsList: ListObjectsV2CommandInput = {
   Bucket: process.env.UPLOAD_BUCKET,
   MaxKeys: 100,
   Delimiter: "/",
+};
+
+const paramsGet: GetObjectCommandInput = {
+  Bucket: process.env.UPLOAD_BUCKET,
+  Key: undefined,
 };
 
 const ensureEndsWith = (str: string, end = "/"): string => {
@@ -34,25 +45,24 @@ const list = async (params: ListObjectsV2CommandInput, accum: string[] = []): Pr
 
 @Injectable()
 export class AppService {
-  async getVideos(folder = ""): Promise<string[]> {
-    console.log("Getting videos for", folder);
+  async list(isImage: boolean, folder = "") {
+    console.log(`Getting ${isImage ? "images" : "videos"} for ${folder}`);
 
     const response = await list({
-      ...params,
-      Prefix: ensureEndsWith(`videos/${folder}`),
+      ...paramsList,
+      Prefix: ensureEndsWith(`${isImage ? "images" : "videos"}/${folder}`),
     });
 
     return response;
   }
 
-  async getImages(folder = "") {
-    console.log("Getting images for", folder);
-
-    const response = await list({
-      ...params,
-      Prefix: ensureEndsWith(`images/${folder}`),
-    });
-
-    return response;
+  async download(key: string, isImage: boolean) {
+    const response = await S3.send(
+      new GetObjectCommand({
+        ...paramsGet,
+        Key: `${isImage ? "images" : "videos"}/${key}`,
+      })
+    );
+    return response.Body!;
   }
 }

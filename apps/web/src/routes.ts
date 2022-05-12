@@ -10,10 +10,14 @@ const ROUTES = import.meta.globEager("/src/pages/**/[a-z[]*.tsx");
 //   }
 
 const routes = Object.keys(ROUTES).map((route) => {
-  const path = route
+  let path = route
     .replace(/\/src\/pages|index|\.tsx$/g, "")
     .replace(/\[\.{3}.+\]/, "*")
     .replace(/\[(.+)\]/, ":$1");
+
+  // remove the / and prepend the baseUrl
+  const baseUrl = import.meta.env.BASE_URL;
+  if (baseUrl !== "/") path = baseUrl + path.substring(1);
 
   return { path, component: ROUTES[route].default };
 });
