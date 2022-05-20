@@ -7,3 +7,10 @@
 # fswebcam --device v4l2:/dev/video0 --delay 2 --skip 2 --frames 1 ./public/history/image.jpg
 # NOTE: The output image is overwritten (this is useful in this case)
 fswebcam --device v4l2:/dev/video0 --delay 2 --skip 2 --frames 1 $1
+
+
+# for knowage: The  PNG or JPEG image can be sent to stdio using the filename "-".
+# The output filename is formatted by strftime.
+# "fswebcam -""
+# a unnecessay example - redirect stdout to a a file so:
+# "fswebcam - > image.jpg" will save it also to image.jpg, same as just "fswebcam image.jpg"

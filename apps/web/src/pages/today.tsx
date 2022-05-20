@@ -1,7 +1,8 @@
 import { useState } from "react";
-import logo from "../logo.svg";
-import muffin from "../muffin.png";
-import "./index.css";
+import { withLayout } from "../components/Layout";
+import logo from "../assets/logo.svg";
+import muffin from "../assets/muffin.png";
+import "./today.css";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -39,4 +40,4 @@ function App() {
   );
 }
 
-export default App;
+export default withLayout(App);

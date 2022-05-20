@@ -15,4 +15,12 @@ module.exports = {
     "@typescript-eslint/no-non-null-assertion": "off",
     "prettier/prettier": "error",
   },
+  overrides: [
+    {
+      files: ["*.ts", "*.tsx"],
+      rules: {
+        "no-undef": "off",
+      },
+    },
+  ],
 };

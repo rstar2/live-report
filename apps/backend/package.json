@@ -1,5 +1,5 @@
 {
-  "name": "live-report-aws",
+  "name": "live-report-backend",
   "version": "1.0.0",
   "private": true,
   "scripts": {

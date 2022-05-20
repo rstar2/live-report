@@ -13,7 +13,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         {routes.map(({ path, component: Component = React.Fragment }) => (
           <Route key={path} path={path} component={Component} exact={true} />
         ))}
-        {/* <Route path="*" component={NotFound} /> */}
       </Switch>
     </Router>
   </React.StrictMode>
