@@ -7,6 +7,8 @@ custom:
   uploadBucket: ${env:UPLOAD_BUCKET}
   uploadBucketArn: arn:aws:s3:::${self:custom.uploadBucket}
   uploadBucketGatewayUrl: ${env:UPLOAD_BUCKET_GATEWAY_URL}
+  # define the name of the DynamoDB Table here as it's ARN will be used in the IAM roles also
+  dataTable: ${self:service}-${self:provider.stage}-data
 
   # set a global value for all functions
   # values from http://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutRetentionPolicy.html
@@ -27,6 +29,8 @@ plugins:
   - serverless-plugin-include-dependencies
   # customize the log retantion for all or individual functions
   - serverless-plugin-log-retention
+  # plugin for assigning additioanl roles per function
+  - serverless-iam-roles-per-function
 
 useDotenv: true  
 
@@ -49,16 +53,6 @@ provider:
     # UPLOAD_BUCKET: ${self:custom.uploadBucket}
     # UPLOAD_BUCKET_GATEWAY_URL: ${self:custom.uploadBucketGatewayUrl}
 
-  iamRoleStatements:
-    # all the Lambda Function(s) to access the specific S3 Bucket (only read permimssions)
-    - Effect: "Allow"
-      Action:
-        - "s3:ListBucket"
-      Resource: ${self:custom.uploadBucketArn}
-    - Effect: "Allow"
-      Action:
-        - "s3:GetObject"
-      Resource: ${self:custom.uploadBucketArn}/*
 
   # logs:
   #   # Enable REST API logs
@@ -80,6 +74,21 @@ provider:
   #     # Whether the API Gateway CloudWatch Logs role setting is not managed by Serverless (default: false)
   #     # roleManagedExternally: false  
 
+  # 'iamRoleStatement' defines the permission policy for ALL Lambda functions.
+  # In this case Lambda functions are granted with permissions to access DynamoDB.
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - "Fn::GetAtt": [ DataTable, Arn ]
+
 functions:
   config:
     handler: src/functions/config/lambda.handler
@@ -88,6 +97,21 @@ functions:
     # https://aws.amazon.com/blogs/aws/announcing-aws-lambda-function-urls-built-in-https-endpoints-for-single-function-microservices/
     url: true
     logRetentionInDays: 30
+    environment:
+      # needed to access the necessary DynamoDB table
+      DYNAMODB_DATA: ${self:custom.dataTable}
+    # defined additional role/permissions for this function
+    iamRoleStatementsInherit: true
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - "ses:SendEmail"
+        Resource: ["*"]
+    events:
+      - schedule:
+          # rate: rate(1 minute)
+          rate: rate(10 minutes) # Run every 10 minute  
+          input: '{"type": "WEBCAM_CHECK"}'
 
   express:
     handler: src/functions/nestjs/lambda.handler
@@ -99,6 +123,20 @@ functions:
       - http: 
          method: ANY
          path: '{proxy+}'
+    
+    # defined additional role/permissions for this function
+    iamRoleStatementsInherit: true
+    iamRoleStatements:
+    # all the Lambda Function(s) to access the specific S3 Bucket (only read permimssions)
+    - Effect: "Allow"
+      Action:
+        - "s3:ListBucket"
+      Resource: ${self:custom.uploadBucketArn}
+    - Effect: "Allow"
+      Action:
+        - "s3:GetObject"
+      Resource: ${self:custom.uploadBucketArn}/*
+
 
 # NOTE!  I could not create the ApiGateway dynamimcally to be integrsated to the bucket
 #        so will create the Policy, Role, S3Bucket, ApiGateway explictly from the AWS Console.
@@ -180,3 +218,26 @@ functions:
 #         HttpMethod: PUT
 #         AuthorizationType: NONE
 #         # Integration:
+
+resources:
+  Resources:
+    DataTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.dataTable}
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          # these are the other attribute definitions going to be used - not as keys
+          # They are just shown for showing what are the item's attributes
+          # !!! They SHOULD NOT be added/uncommented in the configuration, ONLY KeySchema attributes are to be described here
+          # - AttributeName: name
+          #   AttributeType: S      
+          # - AttributeName: checkAt
+          #   AttributeType: N      
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

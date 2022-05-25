@@ -6,18 +6,21 @@ import bent from "bent";
 import cron from "node-cron";
 
 import log from "./logger";
+import * as notify from "./notify";
+import analyze from "./analyze";
 import { createNameForNow, formatString, formatTags } from "./format";
 
 // these are protected by dotenv-safe
-const REST_URL_UPLOAD_IMAGE = process.env.REST_URL_UPLOAD_IMAGE!;
-const REST_URL_TAG_IMAGE = process.env.REST_URL_TAG_IMAGE!;
+const URL_UPLOAD_IMAGE = process.env.URL_UPLOAD_IMAGE!;
+const URL_TAG_IMAGE = process.env.URL_TAG_IMAGE!;
 
 const IMAGE_CAPTURE_CRON = "* * * * *"; // every minute - for testing only
 // const IMAGE_CAPTURE_CRON = "0 7-19 * * *"; // every 1 hour from 7 to 19
 
-const put = bent("PUT");
+const putData = bent("PUT");
 
-// schedule a image capture
+// schedule image capturing
+if (log.isDebug()) log.debug(`Schedule capturing task for ${IMAGE_CAPTURE_CRON}`);
 cron.schedule(IMAGE_CAPTURE_CRON, task);
 
 // reuse same image
@@ -36,14 +39,16 @@ async function task() {
 
     const imageName = createNameForNow() + ".jpg";
 
+    /// no need to wait - do it in parallel
+    notifyImage(imageName, imageBuffer);
+
     // upload it to AWS
-    await uploadImage(imageName, imageBuffer, REST_URL_UPLOAD_IMAGE);
+    await uploadImage(imageName, imageBuffer, URL_UPLOAD_IMAGE);
 
     // tag it as "snapshot" - this has to be done after some timeout in order to allow S# to create the "resource"
     // otherwise executing it immediately after creation has no effect
-
     setTimeout(() => {
-      tagImage(imageName, ["snapshot"], REST_URL_TAG_IMAGE);
+      tagImage(imageName, ["snapshot"], URL_TAG_IMAGE);
     }, 5000);
   } catch (error: unknown) {
     log.warn(`Failed with ${error}`);
@@ -91,7 +96,7 @@ async function uploadImage(name: string, data: Buffer, uploadPutUrl: string) {
 
   if (log.isDebug()) log.debug(`Upload image ${name} to ${uploadPutUrl}`);
 
-  put(uploadPutUrl, data, {
+  putData(uploadPutUrl, data, {
     "Content-Type": "image/jpeg",
   });
 }
@@ -107,7 +112,12 @@ async function tagImage(name: string, tags: string[], tagPutUrl: string) {
   const data = formatTags(tags);
   if (log.isDebug()) log.debug(`Tag image ${name} with ${tags.join()} to ${tagPutUrl}`);
 
-  await put(tagPutUrl, data, {
+  await putData(tagPutUrl, data, {
     "Content-Type": "text/plain",
   });
+}
+
+async function notifyImage(name: string, data: Buffer) {
+  const weatherReport = analyze(data);
+  notify.newImage(name, weatherReport);
 }

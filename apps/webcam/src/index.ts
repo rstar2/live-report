@@ -6,7 +6,10 @@ dotenv.config({
 });
 
 import log from "./logger";
+import * as notify from "./notify";
 
 log.info("Start webcapture service");
+
+notify.start();
 
 import "./webcapture";
