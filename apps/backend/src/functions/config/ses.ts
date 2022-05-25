@@ -9,7 +9,7 @@ const SES = new AWS.SES();
  * Sends email to a verified email address
  */
 export default function (subject: string, message: string, to = receiver): Promise<void> {
-  console.log(`Send email from ${sender} to ${to}`);
+  //console.log(`Send email from ${sender} to ${to}`);
   const emailParams = {
     Source: sender, // SES SENDING EMAIL
     Destination: {
@@ -32,6 +32,6 @@ export default function (subject: string, message: string, to = receiver): Promi
   };
   return SES.sendEmail(emailParams)
     .promise()
-    .then(() => console.log(`Sent email from ${sender} to ${to}`))
+    .then(() => undefined)
     .catch((error) => console.error(`Failed to send email from ${sender} to ${to}: ${error}`));
 }

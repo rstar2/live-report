@@ -8,6 +8,7 @@ import cron from "node-cron";
 import log from "./logger";
 import * as notify from "./notify";
 import analyze from "./analyze";
+import { WeatherReport } from "./utils";
 import { createNameForNow, formatString, formatTags } from "./format";
 
 // these are protected by dotenv-safe
@@ -16,6 +17,8 @@ const URL_TAG_IMAGE = process.env.URL_TAG_IMAGE!;
 
 const IMAGE_CAPTURE_CRON = "* * * * *"; // every minute - for testing only
 // const IMAGE_CAPTURE_CRON = "0 7-19 * * *"; // every 1 hour from 7 to 19
+
+// TODO: implement video capturing
 
 const putData = bent("PUT");
 
@@ -40,7 +43,7 @@ async function task() {
     const imageName = createNameForNow() + ".jpg";
 
     /// no need to wait - do it in parallel
-    notifyImage(imageName, imageBuffer);
+    const weatherReport = await notifyImage(imageName, imageBuffer);
 
     // upload it to AWS
     await uploadImage(imageName, imageBuffer, URL_UPLOAD_IMAGE);
@@ -48,7 +51,12 @@ async function task() {
     // tag it as "snapshot" - this has to be done after some timeout in order to allow S# to create the "resource"
     // otherwise executing it immediately after creation has no effect
     setTimeout(() => {
-      tagImage(imageName, ["snapshot"], URL_TAG_IMAGE);
+      const tags = new Map<string, string>();
+      tags.set("snapshot", "");
+      for (const weather in weatherReport) {
+        tags.set(weather, "" + weatherReport[weather as keyof WeatherReport]);
+      }
+      tagImage(imageName, tags, URL_TAG_IMAGE);
     }, 5000);
   } catch (error: unknown) {
     log.warn(`Failed with ${error}`);
@@ -106,18 +114,19 @@ async function uploadImage(name: string, data: Buffer, uploadPutUrl: string) {
  * @param filePath the file path to the file to read
  * @return the file's data
  */
-async function tagImage(name: string, tags: string[], tagPutUrl: string) {
+async function tagImage(name: string, tags: Map<string, string>, tagPutUrl: string) {
   tagPutUrl = formatString(tagPutUrl, { name });
 
   const data = formatTags(tags);
-  if (log.isDebug()) log.debug(`Tag image ${name} with ${tags.join()} to ${tagPutUrl}`);
+  if (log.isDebug()) log.debug(`Tag image ${name} with ${[...tags.keys()].join()} to ${tagPutUrl}`);
 
   await putData(tagPutUrl, data, {
     "Content-Type": "text/plain",
   });
 }
 
-async function notifyImage(name: string, data: Buffer) {
+async function notifyImage(name: string, data: Buffer): Promise<WeatherReport> {
   const weatherReport = analyze(data);
   notify.newImage(name, weatherReport);
+  return weatherReport;
 }

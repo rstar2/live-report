@@ -1,14 +1,4 @@
-enum Weather {
-  UNKNOWN = "Unknown",
-  SUNNY = "Sunny",
-  RAINY = "Rainy",
-  SNOWY = "Snowy",
-  FOGGY = "Foggy",
-}
-
-export type WeatherReport = {
-  [key in keyof typeof Weather]?: number;
-};
+import { WeatherReport } from "./utils";
 
 /**
  * Analyze the image data and predict a result

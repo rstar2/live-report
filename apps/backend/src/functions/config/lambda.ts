@@ -14,11 +14,7 @@ dotenv.config({
 
 import ses from "./ses";
 import * as dynamodb from "./dynamodb";
-import { formatWeather, WEATHER_UNKNOWN } from "./utils";
-
-// the max period the function is not touched and it would mean then that there's no electricity
-// technically it could be result from a lot of reasons (no electricity, no internet, hardware problem, software problem)
-const MAX_NOT_TOUCHED_PERIOD = process.env.MAX_NOT_TOUCHED_PERIOD ?? 30 * 60 * 1000; // 30 mins
+import { formatWeather, MAX_NOT_TOUCHED_PERIOD, WEATHER_UNKNOWN } from "./utils";
 
 const WEBCAM_EMAIL_SUBJECT = "Cherniovo Live Report";
 
@@ -65,6 +61,7 @@ export const handler: Handler = async (event, _context) => {
         // update latest weather and get previous value
         const oldWeather = await dynamodb.weather(weather);
 
+        console.dir(oldWeather);
         if (oldWeather != weather) {
           //   if (oldWeather === WEATHER_UNKNOWN)
           //     await ses(WEBCAM_EMAIL_SUBJECT, `Weather now is ${formatWeather(weather)}`);
@@ -84,10 +81,8 @@ export const handler: Handler = async (event, _context) => {
         break;
 
       case "WEBCAM_CHECK": {
-        const touchedAt = await dynamodb.touched();
-        // will return -1 if no-such touched value is present yet
-        if (touchedAt > 0 && Date.now() - touchedAt > MAX_NOT_TOUCHED_PERIOD)
-          await ses(WEBCAM_EMAIL_SUBJECT, "Webcam stopped");
+        const report = await dynamodb.report(MAX_NOT_TOUCHED_PERIOD);
+        if (report) await ses(WEBCAM_EMAIL_SUBJECT, "Webcam stopped");
         break;
       }
 

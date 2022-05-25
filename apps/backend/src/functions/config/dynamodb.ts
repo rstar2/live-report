@@ -14,16 +14,17 @@ const WEBCAM_DEFAULt_PARAMS = {
   },
 };
 
-function _touch(weather?: string): Promise<Weather> {
+function markTouched(weather?: string): Promise<Weather> {
   const touchedAt = Date.now();
 
   // ff weather is undefined then it should not be updated
   const params: AWS.DynamoDB.DocumentClient.UpdateItemInput = {
     ...WEBCAM_DEFAULt_PARAMS,
 
-    UpdateExpression: "set touchedAt=:t" + (weather ? ", weather=:w" : ""),
+    UpdateExpression: "set touchedAt=:t, reported=:r" + (weather ? ", weather=:w" : ""),
     ExpressionAttributeValues: {
       ":t": touchedAt,
+      ":r": false,
       ...(weather ? { ":w": weather } : undefined),
     },
     ReturnValues: "ALL_OLD",
@@ -46,20 +47,39 @@ function _touch(weather?: string): Promise<Weather> {
   );
 }
 
+function markReported() {
+  const params: AWS.DynamoDB.DocumentClient.UpdateItemInput = {
+    ...WEBCAM_DEFAULt_PARAMS,
+
+    UpdateExpression: "set reported=:r",
+    ExpressionAttributeValues: {
+      ":r": true,
+    },
+  };
+
+  return dynamoDb
+    .update(params)
+    .promise()
+    .catch((error) => console.error(error));
+}
+
 /**
  * Mark as touched now.
  * @param resetWeather whether to reset/clear the current weather
  * @returns
  */
 export async function touch(resetWeather = false): Promise<void> {
-  return _touch(resetWeather ? WEATHER_UNKNOWN : undefined).then();
+  return markTouched(resetWeather ? WEATHER_UNKNOWN : undefined).then();
 }
 
 /**
- * Get touched mark last date.
+ * Check whether touched mark last date whether has been before a specific period,
+ * and if yes return
  * @returns
  */
-export async function touched(): Promise<number> {
+export async function report(period: number): Promise<boolean> {
+  // TODO: this double access to DynamoDB (get touched time and then mark reported)
+  // can be done in a single call with conditional expressions
   return (
     dynamoDb
       .get(WEBCAM_DEFAULt_PARAMS)
@@ -70,9 +90,13 @@ export async function touched(): Promise<number> {
       // })
       .then(({ Item }) => {
         if (Item) {
-          return (Item as any).touchedAt;
+          const item = Item as any;
+
+          if (!item.reported && Date.now() - item.touchedAt > period) {
+            return markReported().then(() => true);
+          }
         }
-        return -1;
+        return false;
       })
       .catch((error) => {
         console.error(error);
@@ -87,5 +111,5 @@ export async function touched(): Promise<number> {
  * @returns
  */
 export async function weather(weather: string): Promise<Weather> {
-  return _touch(weather);
+  return markTouched(weather);
 }
