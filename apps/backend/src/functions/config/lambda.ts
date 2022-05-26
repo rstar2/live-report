@@ -61,7 +61,6 @@ export const handler: Handler = async (event, _context) => {
         // update latest weather and get previous value
         const oldWeather = await dynamodb.weather(weather);
 
-        console.dir(oldWeather);
         if (oldWeather != weather) {
           //   if (oldWeather === WEATHER_UNKNOWN)
           //     await ses(WEBCAM_EMAIL_SUBJECT, `Weather now is ${formatWeather(weather)}`);

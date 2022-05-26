@@ -1,4 +1,6 @@
 import AWS from "aws-sdk";
+// TODO: use latest @aws-sdk
+
 import { WEATHER_UNKNOWN, Weather } from "./utils";
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
@@ -48,6 +50,7 @@ function markTouched(weather?: string): Promise<Weather> {
 }
 
 function markReported() {
+  console.log("mark reported");
   const params: AWS.DynamoDB.DocumentClient.UpdateItemInput = {
     ...WEBCAM_DEFAULt_PARAMS,
 
@@ -92,6 +95,7 @@ export async function report(period: number): Promise<boolean> {
         if (Item) {
           const item = Item as any;
 
+          console.log("check reported", item);
           if (!item.reported && Date.now() - item.touchedAt > period) {
             return markReported().then(() => true);
           }

@@ -2,29 +2,6 @@
 
 ? Use tsconfig-paths, for usage like "import ... form "@/src/...."?
 
-## Used Technologies
-
-1. FFmpeg for webcam-capture and streaming to a listening HTTP server (e.g. on 8888 port)
-
-```bash
-ffmpeg -f v4l2 \
-           -video_size 640x480 -framerate 25 -i /dev/video0 \
-       -f alsa
-           -ar 44100 -ac 2 -i hw:0 \
-       -f mpegts \
-           -codec:v mpeg1video -s 640x480 -b:v 1000k -bf 0 \
-           -codec:a mp2 -b:a 128k \
-           -muxdelay 0.001 \
-       http://127.0.0.1:8888
-```
-
-Here most important are the output format for MPEG-TS demuxer, MPEG1 video & MP2 audio decoders 
- (which is what later JSMpeg is able to decode)
-
-Capturing HTTP server that:
-  2.1. Simple HTTP Node.js server that listens on 8888 and receives the data sent from ffmpeg
-  2.2. Periodically capture videos/images that way and send them to a storing service (AWS for instance)
-
 ## FFMPEG useful commands
 
 1. List the supported, connected capture devices you can use the v4l-ctl tool:
@@ -54,13 +31,13 @@ ffmpeg -f v4l2 -r 25 -s 640x480 -i /dev/video0 output.mp4
 1. Capture Webcam just a single image
 
 ```bash
-ffmpeg -f video4linux2 -i /dev/v4l/by-id/usb-0c45_USB_camera-video-index0 -vframes 1  -video_size 640x480 test.jpeg
+ffmpeg -f video4linux2 -i /dev/v4l/by-id/usb-0c45_USB_camera-video-index0 -vframes 1  -video_size 640x480 image.jpg
 ```
 
 1. Capture video and audio
 
 ```bash
-ffmpeg -f v4l2 -r 25 -s 640x480 -i /dev/video0 -f alsa -i hw:0 -acodec aac -ac 2 -ab 32k -ar 44100 -f mpegts output.mp4
+ffmpeg -f v4l2 -r 25 -s 640x480 -i /dev/video0 -f alsa -i hw:0 -acodec aac -ac 2 -ab 32k -ar 44100 -f mpegts video.mp4
 ```
 
 Where:
@@ -88,10 +65,16 @@ npm run start
 ## Dev with nodemon
 
 ```bash
-npm run dev
+npm run dev:watch
 ```
 
 it will use nodemon with the configuration nodemon.json
+
+## Dev - single run
+
+```bash
+npm run dev
+```
 
 ## Test
 

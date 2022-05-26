@@ -9,3 +9,7 @@ dist
 
 # Logs from the apps
 logs
+
+# the temp capturing files
+image.jpg
+video.mp4

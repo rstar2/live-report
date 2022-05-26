@@ -8,6 +8,8 @@ const URL_CONFIG = process.env.URL_CONFIG!;
 const post = bent(URL_CONFIG, "POST");
 
 async function notify(type: string, data?: Record<string, unknown>) {
+  if (log.isDebug()) log.debug(`Notify with ${type}`);
+
   data = {
     ...data,
     date: Date.now(),

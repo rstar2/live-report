@@ -110,7 +110,7 @@ functions:
     events:
       - schedule:
           # rate: rate(1 minute)
-          rate: rate(10 minutes) # Run every 10 minute  
+          rate: rate(20 minutes) # Run every 20 minute  
           input: '{"type": "WEBCAM_CHECK"}'
 
   express:
