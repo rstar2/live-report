@@ -1,15 +1,20 @@
 import { useState } from "react";
 import { withLayout } from "../components/Layout";
+import Images from "../components/Images";
+
 import logo from "../assets/logo.svg";
 import muffin from "../assets/muffin.png";
+
 import "./today.css";
 
-function App() {
+function Today() {
   const [count, setCount] = useState(0);
 
   return (
-    <div className="App">
-      <header className="App-header">
+    <div>
+      <Images list={[]} title="Today" />
+
+      <header>
         <img src={logo} className="App-logo" alt="logo" />
         <img src={muffin} alt="muffin" />
         <p>Hello Vite + React!</p>
@@ -40,4 +45,4 @@ function App() {
   );
 }
 
-export default withLayout(App);
+export default withLayout(Today);

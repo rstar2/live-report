@@ -130,11 +130,13 @@ functions:
     # all the Lambda Function(s) to access the specific S3 Bucket (only read permimssions)
     - Effect: "Allow"
       Action:
-        - "s3:ListBucket"
+        - "s3:List*"
+        - "s3:Get*"
       Resource: ${self:custom.uploadBucketArn}
     - Effect: "Allow"
       Action:
-        - "s3:GetObject"
+        - "s3:List*"
+        - "s3:Get*"
       Resource: ${self:custom.uploadBucketArn}/*
 
 

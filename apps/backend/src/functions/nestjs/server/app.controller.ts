@@ -14,13 +14,23 @@ export class AppController {
   }
 
   @Get("videos")
-  async getVideos(): Promise<any> {
+  async getVideos(): Promise<string[]> {
     return this.appService.list(false);
   }
 
   @Get("images")
-  async getImages(): Promise<any> {
+  async getImages(): Promise<string[]> {
     return this.appService.list(true);
+  }
+
+  @Get(["image/:key"])
+  async getImageInfo(@Param("key") key: string): Promise<Record<string, string>> {
+    return this.appService.info(key, true);
+  }
+
+  @Get("video/:key")
+  async getVideoInfo(@Param("key") key: string): Promise<Record<string, string>> {
+    return this.appService.info(key, false);
   }
 
   @Get(["images/**", "videos/**"])
@@ -28,7 +38,7 @@ export class AppController {
     @Req() req: Request,
     @Param("0") key: string,
     @Res({ passthrough: true }) res: Response
-  ): Promise<any> {
+  ): Promise<StreamableFile> {
     // the req.params[0] or @Param("0") will match the whole "**"" in "test/**",
     // request "api/images/asd/qwe/123.txt" -> key is "asd/qwe/123.txt"
     console.log(`Download ${key}`);

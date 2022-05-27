@@ -55,4 +55,8 @@ routes.push(
   }
 );
 
-export { routes };
+const createTo = (to: string): string => {
+  return baseUrl + to;
+};
+
+export { routes, createTo };

@@ -13,6 +13,12 @@ import { createNameForNow, formatString, formatTags } from "./format";
 
 const putData = bent("PUT");
 
+const SIMPLE_NOTIFY_CRON = "*/10 * * * *";
+if (log.isDebug()) log.debug(`Schedule notifying task for ${SIMPLE_NOTIFY_CRON}`);
+cron.schedule(SIMPLE_NOTIFY_CRON, () => {
+  notify.ping();
+});
+
 // implement image capturing
 // const IMAGE_CAPTURE_CRON = "* * * * *"; // every minute - for testing only
 const IMAGE_CAPTURE_CRON = "0 7-19 * * *"; // every 1 hour from 7 to 19

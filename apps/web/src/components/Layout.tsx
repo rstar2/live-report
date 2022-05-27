@@ -1,5 +1,9 @@
 import React from "react";
-import { MantineProvider, AppShell, Navbar, Header } from "@mantine/core";
+import { MantineProvider } from "@mantine/core";
+
+import App from "./App";
+
+const dark = false;
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -8,27 +12,10 @@ function Layout({ children }: { children: React.ReactNode }) {
         // Override any other properties from default theme
         fontFamily: "Open Sans, sans serif",
         spacing: { xs: 15, sm: 20, md: 25, lg: 30, xl: 40 },
-        colorScheme: "dark",
+        colorScheme: dark ? "dark" : "light",
       }}
     >
-      <AppShell
-        padding="md"
-        navbar={
-          <Navbar width={{ base: 300 }} p="xs">
-            Navbar content
-          </Navbar>
-        }
-        header={
-          <Header height={60} p="xs">
-            Header content
-          </Header>
-        }
-        styles={(theme) => ({
-          main: { backgroundColor: theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0] },
-        })}
-      >
-        {children}
-      </AppShell>
+      <App>{children}</App>
     </MantineProvider>
   );
 }

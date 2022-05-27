@@ -6,6 +6,7 @@ import {
   GetObjectCommandInput,
   ListObjectsV2Command,
   ListObjectsV2CommandInput,
+  GetObjectTaggingCommand,
 } from "@aws-sdk/client-s3";
 
 const S3 = new S3Client({ region: process.env.AWS_REGION });
@@ -53,16 +54,44 @@ export class AppService {
       Prefix: ensureEndsWith(`${isImage ? "images" : "videos"}/${folder}`),
     });
 
-    return response;
+    // response is like:
+    // [
+    //    "images/2022_04_25_23_30.jpg",
+    //    "images/2022_04_25_23_31.jpg",
+    //    "images/2022_04_26_13_00.jpg"
+    // ]
+    // so strip the starting "images/" or "videos/" prefix,
+
+    return response.map((key) => key.substring((isImage ? "images/" : "videos/").length));
   }
 
   async download(key: string, isImage: boolean) {
+    const Key = `${isImage ? "images" : "videos"}/${key}`;
+    console.log("Download:", key);
     const response = await S3.send(
       new GetObjectCommand({
         ...paramsGet,
-        Key: `${isImage ? "images" : "videos"}/${key}`,
+        Key,
       })
     );
     return response.Body!;
+  }
+  async info(key: string, isImage: boolean) {
+    // NOTE: the key must not have the starting "images/" or "video/" prefix
+    const Key = `${isImage ? "images" : "videos"}/${key}`;
+    console.log("Get tags for key:", key);
+
+    const response = await S3.send(
+      new GetObjectTaggingCommand({
+        ...paramsGet,
+        Key,
+      })
+    );
+    if (!response.TagSet) return {};
+
+    return response.TagSet.reduce((res, { Key, Value }) => {
+      res[Key!] = Value ?? "";
+      return res;
+    }, {} as Record<string, string>);
   }
 }

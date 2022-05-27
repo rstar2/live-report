@@ -23,6 +23,10 @@ async function notify(type: string, data?: Record<string, unknown>) {
   //   }
 }
 
+export async function ping() {
+  notify("WEBCAM_PING");
+}
+
 export async function start() {
   notify("WEBCAM_START_SERVICE");
 }

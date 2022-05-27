@@ -55,6 +55,10 @@ export const handler: Handler = async (event, _context) => {
         await ses(WEBCAM_EMAIL_SUBJECT, "Webcam restarted");
         break;
 
+      case "WEBCAM_PING":
+        await dynamodb.touch();
+        break;
+
       case "WEBCAM_NEW_IMAGE": {
         const { weather = WEATHER_UNKNOWN } = data;
 
