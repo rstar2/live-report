@@ -21,7 +21,7 @@ cron.schedule(SIMPLE_NOTIFY_CRON, () => {
 
 // implement image capturing
 // const IMAGE_CAPTURE_CRON = "* * * * *"; // every minute - for testing only
-const IMAGE_CAPTURE_CRON = "0 7-19 * * *"; // every 1 hour from 7 to 19
+const IMAGE_CAPTURE_CRON = "0,30 7-19 * * *"; // every 1 hour from 7 to 19
 // reuse same image
 const IMAGE_NAME = "image.jpg";
 // these are protected by dotenv-safe
@@ -34,7 +34,7 @@ cron.schedule(IMAGE_CAPTURE_CRON, taskImage);
 
 // implement video capturing
 // const VIDEO_CAPTURE_CRON = "* * * * *"; // every minute - for testing only
-const VIDEO_CAPTURE_CRON = "0 7,11,15,19 * * *"; // every 7,11,15,19 hours
+const VIDEO_CAPTURE_CRON = "15 7,11,15,19 * * *"; // every 7,11,15,19 hours
 const VIDEO_NAME = "video.mp4";
 // these are protected by dotenv-safe
 const URL_UPLOAD_VIDEO = process.env.URL_UPLOAD_VIDEO!;

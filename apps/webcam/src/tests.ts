@@ -1,6 +1,6 @@
 import cron from "node-cron";
 
-let CRON = "0 7,11,15,19 * * *"; // every 7,11,15,19 hours
+let CRON = "0,30 7,11,15,19 * * *"; // every 7,11,15,19 hours
 let isValid = cron.validate(CRON);
 console.log(`Cron expression ${CRON} is ${isValid ? "" : "NOT"} valid`);
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+VIDEO=$1
+
 # allow setting duration as second optional parameter
 # $ ./webcapture-video.sh video.mp4 5     - will capture a 5 seconds video
 # $ ./webcapture-video.sh video.mp4       - will capture a 10 seconds video
@@ -11,4 +13,6 @@ DUR=${2:-$DUR_DEF}
 ffmpeg -y \
        -f v4l2 -r 25 -s 640x480 -i /dev/video0 \
        -t $DUR \
-       -f mpegts $1
+       -f mpegts $VIDEO
+
+echo "Captured video $VIDEO" >&2
