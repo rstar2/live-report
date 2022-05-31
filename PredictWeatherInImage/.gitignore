@@ -1,0 +1,5 @@
+# the TensorFlow training files
+tf_files
+
+# the python virtual-environment folder
+venv
