@@ -10,6 +10,7 @@ import * as notify from "./notify";
 import analyze from "./analyze";
 import { WeatherReport } from "./utils";
 import { createNameForNow, formatString, formatTags } from "./format";
+import { toThumb } from "./thumb";
 
 const putData = bent("PUT");
 
@@ -69,6 +70,8 @@ async function taskImage() {
 
     // tag it as snapshot and with analyzed weather
     tag(imageName, URL_TAG_IMAGE, weatherReport);
+
+    thumb(imageName, imageBuffer);
   } catch (error: unknown) {
     log.warn(`Failed image capture with ${error}`);
   }
@@ -120,7 +123,7 @@ async function upload(name: string, data: Buffer, uploadPutUrl: string, isVideo:
   if (log.isDebug()) log.debug(`Upload ${isVideo ? "video" : "image"} ${name} to ${uploadPutUrl}`);
 
   putData(uploadPutUrl, data, {
-    "Content-Type": isVideo ? "image/jpeg" : "video/mpeg",
+    "Content-Type": isVideo ? "video/mpeg" : "image/jpeg",
   });
 }
 
@@ -128,10 +131,16 @@ async function upload(name: string, data: Buffer, uploadPutUrl: string, isVideo:
  * Tag a image/video file
  * @param name the name of the file
  */
-async function tag(name: string, tagPutUrl: string, weatherReport?: WeatherReport) {
+async function tag(
+  name: string,
+  tagPutUrl: string,
+  weatherReport?: WeatherReport,
+  isThumb = false
+) {
   tagPutUrl = formatString(tagPutUrl, { name });
 
   const tags = new Map<string, string>([["snapshot", ""]]);
+  if (isThumb) tags.set("thumb", "");
   if (weatherReport) {
     for (const weather in weatherReport) {
       tags.set(weather, "" + weatherReport[weather as keyof WeatherReport]);
@@ -152,6 +161,19 @@ async function tag(name: string, tagPutUrl: string, weatherReport?: WeatherRepor
         .catch(reject);
     }, 5000);
   });
+}
+
+/**
+ * Create an upload thumb image
+ * @param imageName
+ * @param imageBuffer
+ */
+async function thumb(imageName: string, imageBuffer: Buffer) {
+  const thumbName = imageName.replace(".jpg", "-thumb.jpg");
+  const thumb = await toThumb(imageBuffer);
+  await upload(thumbName, thumb, URL_TAG_IMAGE, false);
+
+  tag(thumbName, URL_TAG_IMAGE, undefined, true);
 }
 
 /**
