@@ -171,7 +171,7 @@ async function tag(
 async function thumb(imageName: string, imageBuffer: Buffer) {
   const thumbName = imageName.replace(".jpg", "-thumb.jpg");
   const thumb = await toThumb(imageBuffer);
-  await upload(thumbName, thumb, URL_TAG_IMAGE, false);
+  await upload(thumbName, thumb, URL_UPLOAD_IMAGE, false);
 
   tag(thumbName, URL_TAG_IMAGE, undefined, true);
 }
