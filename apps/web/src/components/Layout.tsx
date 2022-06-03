@@ -1,7 +1,7 @@
 import React from "react";
 import { MantineProvider } from "@mantine/core";
 
-import App from "./App";
+import App from "@/components/App";
 
 const dark = false;
 

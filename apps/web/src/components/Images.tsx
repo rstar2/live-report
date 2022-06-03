@@ -1,13 +1,10 @@
-import { Image } from "../types";
+import { Image } from "@/types";
+
+import { Grid } from "@mantine/core";
 
 export type ImagesProps = {
   list: Image[];
-  title: string;
 };
-export default function Images({ list, title }: ImagesProps) {
-  return (
-    <>
-      {title}'s images {list.length}
-    </>
-  );
+export default function Images({ list }: ImagesProps) {
+  return <Grid>{list.length}</Grid>;
 }

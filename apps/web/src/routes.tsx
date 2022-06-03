@@ -1,5 +1,5 @@
 import { Redirect } from "react-router-dom";
-import NotFound from "./components/NotFound";
+import NotFound from "@/components/NotFound";
 
 // https://omarelhawary.me/blog/file-based-routing-with-react-router-code-splitting
 // For dynamic imports can be used import.meta.glob(...) and React.Lazy and React.Suspense

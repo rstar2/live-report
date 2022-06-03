@@ -1,7 +1,12 @@
 import React, { useState } from "react";
-import { Anchor, AppShell, Navbar, Header, Footer, Text, MediaQuery, Burger, useMantineTheme } from "@mantine/core";
 import { Link } from "react-router-dom";
-import { createTo } from "../routes";
+
+import { Anchor, AppShell, Navbar, Header, Footer, Text, MediaQuery, Burger, useMantineTheme } from "@mantine/core";
+
+import { createTo } from "@/routes";
+
+// import logo from "@/assets/logo.svg";
+// import muffin from "@/assets/muffin.png";
 
 export default function App({ children }: { children: React.ReactNode }) {
   const theme = useMantineTheme();
@@ -56,6 +61,8 @@ export default function App({ children }: { children: React.ReactNode }) {
       }
     >
       {children}
+      {/* <img src={logo} className="App-logo" alt="logo" />
+      <img src={muffin} alt="muffin" /> */}
     </AppShell>
   );
 }

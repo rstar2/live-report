@@ -3,3 +3,6 @@
 
 3. check also https://www.youtube.com/watch?v=BKz7rnbQyK4 and https://bestofreactjs.com/repo/ejazahm3d-fullstack-turborepo-starter
 
+
+4. sync usage of .env files and variables - in web/webcam/serverless
+
