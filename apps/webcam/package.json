@@ -17,8 +17,8 @@
     "log4js": "^6.4.6",
     "node-cron": "^3.0.0",
     "sharp": "^0.30.5",
-    "stringinject": "^2.1.1",
-    "strip-ansi": "^7.0.1"
+    "strip-ansi": "^7.0.1",
+    "utils": "^0.0.0"
   },
   "devDependencies": {
     "@types/bent": "^7.3.2",

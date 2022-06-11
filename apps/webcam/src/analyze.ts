@@ -1,4 +1,4 @@
-import { WeatherReport } from "./utils";
+import { WeatherReport } from "utils";
 
 /**
  * Analyze the image data and predict a result

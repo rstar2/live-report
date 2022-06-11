@@ -1,5 +1,7 @@
 import { Injectable } from "@nestjs/common";
 
+import { formatString } from "utils";
+
 import {
   S3Client,
   GetObjectCommand,
@@ -11,7 +13,10 @@ import {
 
 const S3 = new S3Client({ region: process.env.AWS_REGION });
 
-console.log("Bucket: ", process.env.UPLOAD_BUCKET);
+// UPLOAD_BUCKET_DIRECT_GET_URL is obligatry env-variable (protected by dotenv-safe)
+const UPLOAD_BUCKET_DIRECT_GET_URL = process.env.UPLOAD_BUCKET_DIRECT_GET_URL!;
+// https://xxxxxx/{name}
+
 const paramsList: ListObjectsV2CommandInput = {
   Bucket: process.env.UPLOAD_BUCKET,
   MaxKeys: 100,
@@ -44,6 +49,18 @@ const list = async (params: ListObjectsV2CommandInput, accum: string[] = []): Pr
   });
 };
 
+/**
+ * Get/parse the date (as number) from the passed image/video name
+ * Example: name=2022_04_25_23_30.jpg
+ * @param name the image/video name
+ */
+const parseDate = (name: string): number => {
+  name = name.replace(/\.(.+)$/, "");
+  const parts = name.split("_").map((str) => +str);
+  const date = new Date(parts[0], parts[1], parts[2], parts[3], parts[4]);
+  return date.getTime();
+};
+
 @Injectable()
 export class AppService {
   async list(isImage: boolean, folder = "") {
@@ -62,7 +79,13 @@ export class AppService {
     // ]
     // so strip the starting "images/" or "videos/" prefix,
 
-    return response.map((key) => key.substring((isImage ? "images/" : "videos/").length));
+    return response
+      .map((key) => key.substring((isImage ? "images/" : "videos/").length))
+      .map((name) => ({
+        name,
+        url: formatString(UPLOAD_BUCKET_DIRECT_GET_URL, { name }),
+        date: parseDate(name),
+      }));
   }
 
   async download(key: string, isImage: boolean) {
@@ -76,6 +99,7 @@ export class AppService {
     );
     return response.Body!;
   }
+
   async info(key: string, isImage: boolean) {
     // NOTE: the key must not have the starting "images/" or "video/" prefix
     const Key = `${isImage ? "images" : "videos"}/${key}`;

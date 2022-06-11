@@ -1,7 +1,8 @@
 import { useReducer } from "react";
 
+import { sortByDate } from "utils";
+
 import { ImagesState, Image } from "@/types";
-import { sortByDate } from "@/utils";
 
 const initState: ImagesState = {
   onceLoadedToday: false,

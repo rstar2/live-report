@@ -1,34 +1,56 @@
 /* eslint-disable no-console */
 
+import { isSameDay } from "utils";
+
 import { Image, Video } from "@/types";
 import http from "@/http";
 
 const URL_IMAGES_LIST = import.meta.env.VITE_URL_IMAGES_LIST;
 const URL_VIDEOS_LIST = import.meta.env.VITE_URL_VIDEOS_LIST;
 
+type ItemRaw = {
+  name: string;
+  url: string;
+  date: number;
+};
+
+const getToday = () => new Date();
+const getYesterday = () => {
+  const today = getToday();
+  today.setDate(today.getDate() - 1);
+  return today;
+};
+
+const getItemsForDate = async (dateRequired: Date, isVideo = false) => {
+  const listRaw: ItemRaw[] = await http(isVideo ? URL_VIDEOS_LIST : URL_IMAGES_LIST);
+
+  const list = listRaw
+    .map(
+      ({ name, url, date }) =>
+        ({
+          name,
+          url,
+          date: new Date(date),
+        } as Image)
+    )
+    .filter(({ date }) => isSameDay(dateRequired, date));
+
+  console.log(`Fetched ${list.length} ${isVideo ? "videos" : "images"} for ${dateRequired}`);
+  return list;
+};
+
 export async function getImagesToday(): Promise<Image[]> {
-  const list: [] = await http(URL_IMAGES_LIST);
-  console.log("Fetched today's images", list.length);
-  return [
-    {
-      name: "0",
-      url: "https:/0",
-      date: new Date(),
-    },
-  ];
+  return getItemsForDate(getToday());
 }
 
 export async function getImagesYesterday(): Promise<Image[]> {
-  console.log("Fetch yesterday's images", URL_IMAGES_LIST);
-  return [];
+  return getItemsForDate(getYesterday());
 }
 
 export async function getVideosToday(): Promise<Video[]> {
-  console.log("Fetch today's videos", URL_VIDEOS_LIST);
-  return [];
+  return getItemsForDate(getToday(), true);
 }
 
 export async function getVideosYesterday(): Promise<Video[]> {
-  console.log("Fetch yesterday's videos", URL_VIDEOS_LIST);
-  return [];
+  return getItemsForDate(getYesterday(), true);
 }

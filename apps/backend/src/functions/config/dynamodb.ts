@@ -1,7 +1,7 @@
 import AWS from "aws-sdk";
 // TODO: use latest @aws-sdk
 
-import { WEATHER_UNKNOWN, Weather } from "./utils";
+import { WEATHER_UNKNOWN, WeatherReport } from "utils";
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
@@ -16,7 +16,7 @@ const WEBCAM_DEFAULt_PARAMS = {
   },
 };
 
-function markTouched(weather?: string): Promise<Weather> {
+function markTouched(weather?: string): Promise<WeatherReport> {
   const touchedAt = Date.now();
 
   // ff weather is undefined then it should not be updated
@@ -114,6 +114,6 @@ export async function report(period: number): Promise<boolean> {
  * @param weather the latest know weather, can be missing when service is just started and this is "first" touch
  * @returns
  */
-export async function weather(weather: string): Promise<Weather> {
+export async function weather(weather: string): Promise<WeatherReport> {
   return markTouched(weather);
 }

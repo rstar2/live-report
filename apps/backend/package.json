@@ -41,6 +41,7 @@
     "dotenv-safe": "^8.2.0",
     "lodash": "^4.17.21",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.5.5"
+    "rxjs": "^7.5.5",
+    "utils": "^0.0.0"
   }
 }

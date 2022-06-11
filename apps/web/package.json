@@ -15,7 +15,8 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^5.3.3",
-    "ui": "*"
+    "ui": "*",
+    "utils": "*"
   },
   "devDependencies": {
     "@types/react": "^18.0.0",

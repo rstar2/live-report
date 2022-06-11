@@ -1,7 +1,8 @@
 import { useReducer } from "react";
 
+import { sortByDate } from "utils";
+
 import { VideosState, Video } from "@/types";
-import { sortByDate } from "@/utils";
 
 const initState: VideosState = {
   today: [],

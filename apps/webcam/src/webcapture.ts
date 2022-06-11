@@ -5,11 +5,12 @@ import bent from "bent";
 
 import cron from "node-cron";
 
+import { WeatherReport, WEATHER_UNKNOWN, createNameForNow, formatString } from "utils";
+
 import log from "./logger";
 import * as notify from "./notify";
 import analyze from "./analyze";
-import { WeatherReport } from "./utils";
-import { createNameForNow, formatString, formatTags } from "./format";
+import { formatTags } from "./format";
 import { toThumb } from "./thumb";
 
 const putData = bent("PUT");
@@ -141,7 +142,7 @@ async function tag(
 
   const tags = new Map<string, string>([["snapshot", ""]]);
   if (isThumb) tags.set("thumb", "");
-  if (weatherReport) {
+  if (weatherReport && weatherReport !== WEATHER_UNKNOWN) {
     for (const weather in weatherReport) {
       tags.set(weather, "" + weatherReport[weather as keyof WeatherReport]);
     }

@@ -1,5 +1,5 @@
 import bent, { NodeResponse } from "bent";
-import { WeatherReport } from "./utils";
+import { WeatherReport } from "utils";
 
 import log from "./logger";
 

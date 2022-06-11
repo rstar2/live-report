@@ -14,7 +14,7 @@ export default defineConfig(() => {
     },
     plugins: [react()],
 
-    // TODO: pass this base url
+    // TODO: pass this base url as env variable
     // the default is "/" which makes resources served at root level, which is not so in my case
     // where they should be served (by nestjs) at "https://asdasd.aws.com/development/xxxxx"
     base: "/development/",

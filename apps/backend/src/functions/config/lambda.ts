@@ -4,6 +4,8 @@ import { Handler } from "aws-lambda";
 
 import dotenv from "dotenv";
 
+import { formatWeather, MAX_NOT_TOUCHED_PERIOD, WEATHER_UNKNOWN } from "utils";
+
 // load a .env.XXXXXXX file , so NODE_ENV is obligatory
 if (!process.env.NODE_ENV) throw new Error("Not passed NODE_ENV environment variable");
 
@@ -14,7 +16,6 @@ dotenv.config({
 
 import ses from "./ses";
 import * as dynamodb from "./dynamodb";
-import { formatWeather, MAX_NOT_TOUCHED_PERIOD, WEATHER_UNKNOWN } from "./utils";
 
 const WEBCAM_EMAIL_SUBJECT = "Cherniovo Live Report";
 
