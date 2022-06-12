@@ -1,4 +1,4 @@
-import bent, { NodeResponse } from "bent";
+import bent, { NodeResponse, StatusError } from "bent";
 import { WeatherReport } from "utils";
 
 import log from "./logger";
@@ -15,9 +15,10 @@ async function notify(type: string, data?: Record<string, unknown>) {
     date: Date.now(),
     type,
   };
-  /* const response = await  */ post("", data).catch((error) =>
-    log.warn(`Failed to notify with ${type}`, error)
-  );
+  /* const response = await  */ post("", data).catch(async (error: StatusError) => {
+    const msg = await error.text();
+    log.warn(`Failed to notify with ${type}`, new Error(msg));
+  });
   //   if (response) {
   //     console.log(await (response as NodeResponse).json());
   //   }

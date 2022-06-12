@@ -11,9 +11,21 @@ import {
   GetObjectTaggingCommand,
 } from "@aws-sdk/client-s3";
 
-const S3 = new S3Client({ region: process.env.AWS_REGION });
+const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID;
+const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
 
-// UPLOAD_BUCKET_DIRECT_GET_URL is obligatry env-variable (protected by dotenv-safe)
+const S3 = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials:
+    AWS_ACCESS_KEY_ID && AWS_SECRET_ACCESS_KEY
+      ? {
+          accessKeyId: AWS_ACCESS_KEY_ID,
+          secretAccessKey: AWS_SECRET_ACCESS_KEY,
+        }
+      : undefined,
+});
+
+// UPLOAD_BUCKET_DIRECT_GET_URL is obligatory env-variable (protected by dotenv-safe)
 const UPLOAD_BUCKET_DIRECT_GET_URL = process.env.UPLOAD_BUCKET_DIRECT_GET_URL!;
 // https://xxxxxx/{name}
 
@@ -57,7 +69,7 @@ const list = async (params: ListObjectsV2CommandInput, accum: string[] = []): Pr
 const parseDate = (name: string): number => {
   name = name.replace(/\.(.+)$/, "");
   const parts = name.split("_").map((str) => +str);
-  const date = new Date(parts[0], parts[1], parts[2], parts[3], parts[4]);
+  const date = new Date(parts[0], parts[1] - 1, parts[2], parts[3], parts[4]);
   return date.getTime();
 };
 
@@ -66,7 +78,7 @@ export class AppService {
   async list(isImage: boolean, folder = "") {
     console.log(`Getting ${isImage ? "images" : "videos"} for ${folder}`);
 
-    const response = await list({
+    let response = await list({
       ...paramsList,
       Prefix: ensureEndsWith(`${isImage ? "images" : "videos"}/${folder}`),
     });
@@ -79,12 +91,14 @@ export class AppService {
     // ]
     // so strip the starting "images/" or "videos/" prefix,
 
+    if (isImage) response = response.filter((key) => !key.endsWith("-thumb.jpg"));
+
     return response
       .map((key) => key.substring((isImage ? "images/" : "videos/").length))
       .map((name) => ({
         name,
-        url: formatString(UPLOAD_BUCKET_DIRECT_GET_URL, { name }),
         date: parseDate(name),
+        url: formatString(UPLOAD_BUCKET_DIRECT_GET_URL, { name }),
       }));
   }
 

@@ -18,10 +18,11 @@ package:
   include:
     - ".env.example"
     - ".env.${sls:stage, 'development'}"
+    - ".env.offline"
     - "src/functions/nestjs/client"
 
 plugins:
-  - serverless-plugin-typescript 
+  - serverless-plugin-typescript
   - serverless-offline
   # this will include only the dependencies that are used,
   # other options are serverless-webpack or serverless-bundle that produce a single file
@@ -96,7 +97,7 @@ functions:
     # https://www.serverless.com/blog/aws-lambda-function-urls-with-serverless-framework
     # https://aws.amazon.com/blogs/aws/announcing-aws-lambda-function-urls-built-in-https-endpoints-for-single-function-microservices/
     url: true
-    logRetentionInDays: 30
+    logRetentionInDays: 3
     environment:
       # needed to access the necessary DynamoDB table
       DYNAMODB_DATA: ${self:custom.dataTable}
@@ -115,6 +116,7 @@ functions:
 
   express:
     handler: src/functions/nestjs/lambda.handler
+    logRetentionInDays: 7
     # this will be a full Nest.js app 
     events:
       - http:

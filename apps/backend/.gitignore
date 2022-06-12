@@ -4,7 +4,9 @@ jspm_packages
 
 # Serverless directories
 .serverless
+.build
 
 # Real environment variable files
 .env.development
 .env.production
+.env.offline

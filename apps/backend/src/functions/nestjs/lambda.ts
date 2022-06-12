@@ -15,6 +15,13 @@ dotenv.config({
   debug: true,
 });
 
+// load a special .env.offline file just when run with 'sls offline'
+if (process.env.IS_OFFLINE === "true")
+  dotenv.config({
+    path: join(__dirname, "../../../", `.env.offline`),
+    debug: true,
+  });
+
 import { AppModule } from "./server/app.module";
 
 let cachedServer: Handler;

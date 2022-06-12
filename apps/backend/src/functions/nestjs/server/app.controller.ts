@@ -14,12 +14,12 @@ export class AppController {
   }
 
   @Get("videos")
-  async getVideos(): Promise<string[]> {
+  async getVideos(): Promise<any[]> {
     return this.appService.list(false);
   }
 
   @Get("images")
-  async getImages(): Promise<string[]> {
+  async getImages(): Promise<any[]> {
     return this.appService.list(true);
   }
 

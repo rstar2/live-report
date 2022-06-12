@@ -1,6 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore - there's no @types/stringinject
-import stringInject from "stringinject";
+import stringInject from "./string-inject";
 
 export * from "./types";
 
@@ -57,12 +55,6 @@ export function createNameForDate(date: Date) {
     .join("_");
 }
 
-type Primitive = string | number | boolean;
-
-type Args = {
-  [key: string]: Primitive;
-};
-
-export function formatString(placeholder: string, args: Args): string {
+export function formatString(placeholder: string, args: string[] | Record<string, string>): string {
   return stringInject(placeholder, args);
 }
