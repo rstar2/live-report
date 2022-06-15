@@ -7,6 +7,8 @@ import { VideosState, Video } from "@/types";
 const initState: VideosState = {
   today: [],
   yesterday: [],
+  onceLoadedToday: false,
+  onceLoadedYesterday: false,
 };
 const reducer = (prevState: VideosState, action: VideosAction): VideosState => {
   let key!: keyof VideosState;

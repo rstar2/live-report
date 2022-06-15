@@ -9,11 +9,19 @@ This turborepo includes the following packages/apps:
 ### Apps and Packages
 
 - `web`: a Vite React-ts[Vite.js](https://vitejs.dev/) app
-- `webcam`: a node server that uses the Webcam to take snapshots and videos and send to the `aws` app
-- `aws`: a Serverless powered AWS cloud-formation app that stores the snapshots and videos sent from the `webcam` app
+- `webcam`: a node server that uses the Webcam to take snapshots and videos and save then directly to the AWS S3 (through a configured API Gateway)
+- `backend`: A NestJs server app (deployed with Serverless to AWS) that enumerates/lists the stored images.
 - `ui`: a stub React component library used by `web`
 - `config`: `eslint` configurations (includes `eslint-config-prettier` and etc...)
 - `tsconfig`: `tsconfig.json`s used throughout the monorepo
+- `utils`: a general utility library used in `backend` and `webcam` (common types, methods, etc...)
+
+### Notes
+
+- The AWS S3 bucket storing the images/videos is pre-configured manually (as well as the API Gateway that simplifies putting the data in it)
+- The compiled `web` app is a client module served statically by this NestJs, so when built it's output is put into the `backend`. This means that building of `web` should be before `backend`
+- The `utils` package is entirely in TypeScript, but is used by the `webcam` and `backend` apps which are actually NodeJs applications (e.g compiled to JS , even though source is TypeScript and ES6 modules), so it has to be compiled also. For this reason the `utils` has to be build (npm run build) before running and deploying the `webcam` and `backend` apps.
+- The `utils` package is used also form `web`, which uses directly the TypeScript files. One way is to `import xxx from "utils/src"` and another is to specify both 'main' and 'module' paths in the `utils` package.json.
 
 ## For Turborepo (it utilizes the NPM workspaces)
 

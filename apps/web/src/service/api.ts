@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import { isSameDay } from "utils";
+import { isSameDay } from "utils/src";
 
 import { Image, Video } from "@/types";
 import http from "@/http";
@@ -23,6 +23,9 @@ const getYesterday = () => {
 
 const getItemsForDate = async (dateRequired: Date, isVideo = false) => {
   const listRaw: ItemRaw[] = await http(isVideo ? URL_VIDEOS_LIST : URL_IMAGES_LIST);
+ 
+  // TODO: temporary hack
+  dateRequired.setMonth(dateRequired.getMonth() - 1);
 
   const list = listRaw
     .map(

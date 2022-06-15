@@ -1,6 +1,6 @@
 import { useReducer } from "react";
 
-import { sortByDate } from "utils";
+import { sortByDate } from "utils/src";
 
 import { ImagesState, Image } from "@/types";
 
