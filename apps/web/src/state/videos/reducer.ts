@@ -7,17 +7,26 @@ import { VideosState, Video } from "@/types";
 const initState: VideosState = {
   today: [],
   yesterday: [],
+  dateToday: new Date(),
+  dateYesterday: (() => {
+    const date = new Date();
+    date.setDate(date.getDate() - 1);
+    return date;
+  })(),
   onceLoadedToday: false,
   onceLoadedYesterday: false,
 };
 const reducer = (prevState: VideosState, action: VideosAction): VideosState => {
   let key!: keyof VideosState;
+  let keyDate!: keyof VideosState;
   switch (action.type) {
     case "LIST_TODAY":
       key = "today";
+      keyDate = "dateToday";
       break;
     case "LIST_YESTERDAY":
       key = "yesterday";
+      keyDate = "dateYesterday";
       break;
     default:
       throw new Error();
@@ -26,6 +35,8 @@ const reducer = (prevState: VideosState, action: VideosAction): VideosState => {
     ...prevState,
     // sort by date
     [key]: action.list.sort(sortByDate),
+    // set the used date
+    [keyDate]: action.date,
   };
 };
 
@@ -37,10 +48,12 @@ export type VideosActionType = "LIST_TODAY" | "LIST_YESTERDAY";
 type VideosActionListToday = {
   type: "LIST_TODAY";
   list: Video[];
+  date: Date;
 };
 type VideosActionListYesterday = {
   type: "LIST_YESTERDAY";
   list: Video[];
+  date: Date;
 };
 
 export const useVideosReducer = () => {

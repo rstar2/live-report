@@ -10,9 +10,9 @@ function createImagesContextValue(state: ImagesState, dispatch: React.Dispatch<I
   const refresh = async (type: ImagesActionType) => {
     //   setLoading(true, "Refreshing images...");
     try {
-      const list = await (type === "LIST_TODAY" ? api.getImagesToday() : api.getImagesYesterday());
+      const {list, date} = await (type === "LIST_TODAY" ? api.getImagesToday() : api.getImagesYesterday());
 
-      dispatch({ type, list });
+      dispatch({ type, list, date });
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error("Failed to load/refresh images", err);

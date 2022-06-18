@@ -3,16 +3,21 @@ import { MantineProvider } from "@mantine/core";
 
 import App from "@/components/App";
 
-const dark = false;
+const dark = true;
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
     <MantineProvider
+      withNormalizeCSS
+      withGlobalStyles
       theme={{
         // Override any other properties from default theme
         fontFamily: "Open Sans, sans serif",
         spacing: { xs: 15, sm: 20, md: 25, lg: 30, xl: 40 },
         colorScheme: dark ? "dark" : "light",
+
+        // can be any color defined in theme.colors
+        primaryColor: "orange",
       }}
     >
       <App>{children}</App>

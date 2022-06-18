@@ -10,9 +10,9 @@ function createVideosContextValue(state: VideosState, dispatch: React.Dispatch<V
   const refresh = async (type: VideosActionType) => {
     //   setLoading(true, "Refreshing videos...");
     try {
-      const list = await (type === "LIST_TODAY" ? api.getVideosToday() : api.getVideosYesterday());
+      const {list, date} = await (type === "LIST_TODAY" ? api.getVideosToday() : api.getVideosYesterday());
 
-      dispatch({ type, list });
+      dispatch({ type, list, date });
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error("Failed to load/refresh videos", err);

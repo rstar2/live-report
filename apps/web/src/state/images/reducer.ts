@@ -7,20 +7,29 @@ import { ImagesState, Image } from "@/types";
 const initState: ImagesState = {
   onceLoadedToday: false,
   onceLoadedYesterday: false,
+  dateToday: new Date(),
+  dateYesterday: (() => {
+    const date = new Date();
+    date.setDate(date.getDate() - 1);
+    return date;
+  })(),
   today: [],
   yesterday: [],
 };
 const reducer = (prevState: ImagesState, action: ImagesAction): ImagesState => {
   let keyList!: keyof ImagesState;
   let keyLoaded!: keyof ImagesState;
+  let keyDate!: keyof ImagesState;
   switch (action.type) {
     case "LIST_TODAY":
       keyList = "today";
       keyLoaded = "onceLoadedToday";
+      keyDate = "dateToday";
       break;
     case "LIST_YESTERDAY":
       keyList = "yesterday";
       keyLoaded = "onceLoadedYesterday";
+      keyDate = "dateYesterday";
       break;
     default:
       throw new Error();
@@ -33,6 +42,9 @@ const reducer = (prevState: ImagesState, action: ImagesAction): ImagesState => {
 
     // sort by date
     [keyList]: action.list.sort(sortByDate),
+
+    // set the used date
+    [keyDate]: action.date,
   };
 };
 
@@ -41,10 +53,12 @@ export type ImagesAction = ImagesActionListToday | ImagesActionListYesterday;
 type ImagesActionListToday = {
   type: "LIST_TODAY";
   list: Image[];
+  date: Date;
 };
 type ImagesActionListYesterday = {
   type: "LIST_YESTERDAY";
   list: Image[];
+  date: Date;
 };
 
 export type ImagesActionType = "LIST_TODAY" | "LIST_YESTERDAY";

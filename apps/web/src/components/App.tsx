@@ -12,11 +12,9 @@ export default function App({ children }: { children: React.ReactNode }) {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
 
-  const today = new Date();
-  const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
-
   return (
     <AppShell
+      /* NOTE: Apply style with the Styles API to concrete App sub-element - e,g. by passing classes */
       styles={{
         main: {
           background: theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0],
@@ -26,28 +24,31 @@ export default function App({ children }: { children: React.ReactNode }) {
       fixed
       header={
         <Header height={70} p="md">
+          {/* NOTE: Apply style with the Styles API to a - e.g. with inline styles */}
           <div style={{ display: "flex", alignItems: "center", height: "100%" }}>
             <MediaQuery largerThan="sm" styles={{ display: "none" }}>
               <Burger
                 opened={opened}
                 onClick={() => setOpened((o) => !o)}
                 size="sm"
-                color={theme.colors.gray[6]}
-                mr="xl"
+                color={theme.colors.orange[6]}
+                mr="md"
               />
             </MediaQuery>
 
-            <Text>Cherniovo Live Report</Text>
+            <Text color={theme.colors.orange[5]} size="xl">
+              Cherniovo Live Report
+            </Text>
           </div>
         </Header>
       }
       navbar={
-        <Navbar p="md" hiddenBreakpoint="sm" hidden={!opened} width={{ sm: 200, lg: 300 }}>
+        <Navbar p="md" hiddenBreakpoint="sm" hidden={!opened} width={{ sm: 150, lg: 200 }}>
           <Anchor component={Link} to={createTo("today")}>
-            Today - {today.toDateString()}
+            Today
           </Anchor>
           <Anchor component={Link} to={createTo("yesterday")}>
-            Yesterday - {yesterday.toDateString()}
+            Yesterday
           </Anchor>
         </Navbar>
       }

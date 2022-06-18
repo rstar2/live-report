@@ -21,7 +21,7 @@ This turborepo includes the following packages/apps:
 - The AWS S3 bucket storing the images/videos is pre-configured manually (as well as the API Gateway that simplifies putting the data in it)
 - The compiled `web` app is a client module served statically by this NestJs, so when built it's output is put into the `backend`. This means that building of `web` should be before `backend`
 - The `utils` package is entirely in TypeScript, but is used by the `webcam` and `backend` apps which are actually NodeJs applications (e.g compiled to JS , even though source is TypeScript and ES6 modules), so it has to be compiled also. For this reason the `utils` has to be build (npm run build) before running and deploying the `webcam` and `backend` apps.
-- The `utils` package is used also form `web`, which uses directly the TypeScript files. One way is to `import xxx from "utils/src"` and another is to specify both 'main' and 'module' paths in the `utils` package.json.
+- The `utils` package is used also form `web`, which uses directly the TypeScript files. One way is to `import xxx from "utils/src"` and another is to specify both `main` and `module` paths in the `utils` package.json.
 
 ## For Turborepo (it utilizes the NPM workspaces)
 

@@ -11,9 +11,11 @@ export type Video = Item;
 type ItemsState<T extends Item> = {
   onceLoadedToday: boolean;
   today: T[];
+  dateToday: Date;
 
   onceLoadedYesterday: boolean;
   yesterday: T[];
+  dateYesterday: Date;
 };
 
 export type ImagesState = ItemsState<Image>;
