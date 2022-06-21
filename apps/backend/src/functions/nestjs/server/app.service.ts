@@ -11,8 +11,10 @@ import {
   GetObjectTaggingCommand,
 } from "@aws-sdk/client-s3";
 
-const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID;
-const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
+// AWS_ACCESS_KEY_ID , AWS_SECRET_ACCESS_KEY and som more are predefined by AWS Lambda environment variables
+// so don't use same names
+const AWS_ACCESS_KEY_ID = process.env.ACCESS_KEY_ID;
+const AWS_SECRET_ACCESS_KEY = process.env.SECRET_ACCESS_KEY;
 
 const S3 = new S3Client({
   region: process.env.AWS_REGION,

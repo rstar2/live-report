@@ -4,7 +4,7 @@ import { Handler } from "aws-lambda";
 
 import dotenv from "dotenv";
 
-import { formatWeather, MAX_NOT_TOUCHED_PERIOD, WEATHER_UNKNOWN } from "utils";
+import { formatWeather, MAX_NOT_TOUCHED_PERIOD, WEATHER_UNKNOWN, WeatherReport } from "utils";
 
 // load a .env.XXXXXXX file , so NODE_ENV is obligatory
 if (!process.env.NODE_ENV) throw new Error("Not passed NODE_ENV environment variable");
@@ -61,7 +61,7 @@ export const handler: Handler = async (event, _context) => {
         break;
 
       case "WEBCAM_NEW_IMAGE": {
-        const { weather = WEATHER_UNKNOWN } = data;
+        const { weather = WEATHER_UNKNOWN } = data as { weather?: WeatherReport };
 
         // update latest weather and get previous value
         const oldWeather = await dynamodb.weather(weather);

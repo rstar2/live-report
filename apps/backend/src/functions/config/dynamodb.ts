@@ -1,33 +1,73 @@
-import AWS from "aws-sdk";
-// TODO: use latest @aws-sdk
+import {
+  DynamoDBClient,
+  UpdateItemCommand,
+  UpdateItemInput,
+  GetItemCommand,
+  AttributeValue,
+} from "@aws-sdk/client-dynamodb";
+
+import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 
 import { WEATHER_UNKNOWN, WeatherReport } from "utils";
 
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
+// AWS_ACCESS_KEY_ID , AWS_SECRET_ACCESS_KEY and som more are predefined by AWS Lambda environment variables
+// so don't use same names
+const AWS_ACCESS_KEY_ID = process.env.ACCESS_KEY_ID;
+const AWS_SECRET_ACCESS_KEY = process.env.SECRET_ACCESS_KEY;
+
+const dynamoDb = new DynamoDBClient({
+  region: process.env.AWS_REGION,
+  credentials:
+    AWS_ACCESS_KEY_ID && AWS_SECRET_ACCESS_KEY
+      ? {
+          accessKeyId: AWS_ACCESS_KEY_ID,
+          secretAccessKey: AWS_SECRET_ACCESS_KEY,
+        }
+      : undefined,
+});
 
 const TABLE_NAME = process.env.DYNAMODB_DATA!;
 
 const WEBCAM_TOUCHED_ID = "webcam_touched";
 
-const WEBCAM_DEFAULt_PARAMS = {
+const WEBCAM_DEFAULT_PARAMS = {
   TableName: TABLE_NAME,
   Key: {
-    id: WEBCAM_TOUCHED_ID,
+    id: { S: WEBCAM_TOUCHED_ID },
   },
 };
 
-function markTouched(weather?: string): Promise<WeatherReport> {
+function markTouched(weather?: WeatherReport): Promise<WeatherReport> {
   const touchedAt = Date.now();
 
+  let marshalledWeather: AttributeValue | undefined;
+  if (weather) {
+    // cannot get it "work" with TypeScript (I think the marshall.d.ts is not correct)
+    // so will disable some checks, still th result must be like:
+    //   if weather is string      ->  { S: "rainy" }
+    //   if weather is object-map  ->  { M: { rain: { N: "55" } } }
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    if (typeof weather === "string") marshalledWeather = marshall(weather);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    else marshalledWeather = { M: marshall(weather) };
+
+    console.log("marshalled weather", marshalledWeather);
+  }
+
   // ff weather is undefined then it should not be updated
-  const params: AWS.DynamoDB.DocumentClient.UpdateItemInput = {
-    ...WEBCAM_DEFAULt_PARAMS,
+  const params: UpdateItemInput = {
+    ...WEBCAM_DEFAULT_PARAMS,
 
     UpdateExpression: "set touchedAt=:t, reported=:r" + (weather ? ", weather=:w" : ""),
     ExpressionAttributeValues: {
-      ":t": touchedAt,
-      ":r": false,
-      ...(weather ? { ":w": weather } : undefined),
+      ":t": { N: "" + touchedAt },
+      ":r": { BOOL: false },
+      //   ...(weather ? { ":w": { S: "weather" } } : undefined),
+      //   ...(weather ? { ":w": { M: { rain: { N: "55" } } } } : undefined),
+      ...(marshalledWeather ? { ":w": marshalledWeather } : undefined),
     },
     ReturnValues: "ALL_OLD",
   };
@@ -35,14 +75,13 @@ function markTouched(weather?: string): Promise<WeatherReport> {
   // DynamoDB’s update is like Postgres’ UPSERT - will add it if's missing
   return (
     dynamoDb
-      .update(params)
-      .promise()
+      .send(new UpdateItemCommand(params))
       // .then((data) => {
       //   console.dir(data);
       //   return data;
       // })
       .then(({ Attributes }) => {
-        if (Attributes) return (Attributes as any).weather;
+        if (Attributes) return unmarshall(Attributes).weather;
         return WEATHER_UNKNOWN;
       })
       .catch((error) => console.error(error))
@@ -51,19 +90,16 @@ function markTouched(weather?: string): Promise<WeatherReport> {
 
 function markReported() {
   console.log("mark reported");
-  const params: AWS.DynamoDB.DocumentClient.UpdateItemInput = {
-    ...WEBCAM_DEFAULt_PARAMS,
+  const params: UpdateItemInput = {
+    ...WEBCAM_DEFAULT_PARAMS,
 
     UpdateExpression: "set reported=:r",
     ExpressionAttributeValues: {
-      ":r": true,
+      ":r": { BOOL: true },
     },
   };
 
-  return dynamoDb
-    .update(params)
-    .promise()
-    .catch((error) => console.error(error));
+  return dynamoDb.send(new UpdateItemCommand(params)).catch((error) => console.error(error));
 }
 
 /**
@@ -85,15 +121,48 @@ export async function report(period: number): Promise<boolean> {
   // can be done in a single call with conditional expressions
   return (
     dynamoDb
-      .get(WEBCAM_DEFAULt_PARAMS)
-      .promise()
+      .send(new GetItemCommand(WEBCAM_DEFAULT_PARAMS))
       // .then((data) => {
       //   console.dir(data);
       //   return data;
       // })
       .then(({ Item }) => {
         if (Item) {
-          const item = Item as any;
+          // by default it's in the form of "DynamoDB JSON",
+          //  so transform it to plain JSON - this is called unmarshall
+          // Example:
+          //   {
+          //     "id": {
+          //      "S": "webcam_touched"
+          //     },
+          //     "reported": {
+          //      "BOOL": false
+          //     },
+          //     "touchedAt": {
+          //      "N": "1645756270072"
+          //     },
+          //     "weather": {
+          //      "M": {
+          //       "FOGGY": {
+          //        "N": "33"
+          //       },
+          //       "SUNNY": {
+          //        "N": "90"
+          //       }
+          //      }
+          //     }
+          //    }
+          // So make it as plain JSON:
+          //   {
+          //     "id": "webcam_touched",
+          //     "reported": false,
+          //     "touchedAt": 1645756270072,
+          //     "weather": {
+          //      "FOGGY": 33,
+          //      "SUNNY": 90
+          //     }
+          //    }
+          const item = unmarshall(Item);
 
           console.log("check reported", item);
           if (!item.reported && Date.now() - item.touchedAt > period) {
@@ -114,6 +183,6 @@ export async function report(period: number): Promise<boolean> {
  * @param weather the latest know weather, can be missing when service is just started and this is "first" touch
  * @returns
  */
-export async function weather(weather: string): Promise<WeatherReport> {
+export async function weather(weather: WeatherReport): Promise<WeatherReport> {
   return markTouched(weather);
 }

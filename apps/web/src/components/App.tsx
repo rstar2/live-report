@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 import { Anchor, AppShell, Navbar, Header, Footer, Text, MediaQuery, Burger, useMantineTheme } from "@mantine/core";
 
@@ -43,13 +43,9 @@ export default function App({ children }: { children: React.ReactNode }) {
         </Header>
       }
       navbar={
-        <Navbar p="md" hiddenBreakpoint="sm" hidden={!opened} width={{ sm: 150, lg: 200 }}>
-          <Anchor component={Link} to={createTo("today")}>
-            Today
-          </Anchor>
-          <Anchor component={Link} to={createTo("yesterday")}>
-            Yesterday
-          </Anchor>
+        <Navbar p="md" hiddenBreakpoint="sm" hidden={!opened} width={{ sm: 120, lg: 150 }}>
+          <Link to="today" name="Today" />
+          <Link to="yesterday" name="Yesterday" />
         </Navbar>
       }
       footer={
@@ -65,5 +61,14 @@ export default function App({ children }: { children: React.ReactNode }) {
       {/* <img src={logo} className="App-logo" alt="logo" />
       <img src={muffin} alt="muffin" /> */}
     </AppShell>
+  );
+}
+
+function Link({ to, name }: { to: string; name: string }) {
+  const theme = useMantineTheme();
+  return (
+    <Anchor component={NavLink} to={createTo(to)} activeStyle={{ color: theme.colors.orange[9] }}>
+      {name}
+    </Anchor>
   );
 }
