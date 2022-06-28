@@ -68,11 +68,11 @@ const list = async (params: ListObjectsV2CommandInput, accum: string[] = []): Pr
  * Example: name=2022_04_25_23_30.jpg
  * @param name the image/video name
  */
-const parseDate = (name: string): number => {
+const parseDate = (name: string, hourOffset: number): number => {
   name = name.replace(/\.(.+)$/, "");
   const parts = name.split("_").map((str) => +str);
   const date = new Date(parts[0], parts[1] - 1, parts[2], parts[3], parts[4]);
-  return date.getTime();
+  return date.getTime() - hourOffset * 60 * 1000;
 };
 
 @Injectable()
@@ -95,11 +95,14 @@ export class AppService {
 
     if (isImage) response = response.filter((key) => !key.endsWith("-thumb.jpg"));
 
+    // the date in the name is in local time of the webcam service which is EET, which is UTC+3, so 3 hours offset
+    const hourOffset = 3;
+
     return response
       .map((key) => key.substring((isImage ? "images/" : "videos/").length))
       .map((name) => ({
         name,
-        date: parseDate(name),
+        date: parseDate(name, hourOffset),
         url: formatString(UPLOAD_BUCKET_DIRECT_GET_URL, { name }),
       }));
   }

@@ -14,16 +14,16 @@ type ItemRaw = {
   date: number;
 };
 
-// const getToday = () => new Date();
-// const getYesterday = () => {
-//   const today = getToday();
-//   today.setDate(today.getDate() - 1);
-//   return today;
-// };
+const getToday = () => new Date();
+const getYesterday = () => {
+  const today = getToday();
+  today.setDate(today.getDate() - 1);
+  return today;
+};
 
 // use a fixed date for testing when the webcam service is stopped
-const getToday = () => new Date(Date.parse("6/17/2022"));
-const getYesterday = () => new Date(Date.parse("6/17/2022"));
+// const getToday = () => new Date(Date.parse("6/17/2022"));
+// const getYesterday = () => new Date(Date.parse("6/17/2022"));
 
 const getItemsForDate = async (dateRequired: Date, isVideo = false) => {
   const listRaw: ItemRaw[] = await http(isVideo ? URL_VIDEOS_LIST : URL_IMAGES_LIST);

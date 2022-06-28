@@ -10,7 +10,7 @@ function createImagesContextValue(state: ImagesState, dispatch: React.Dispatch<I
   const refresh = async (type: ImagesActionType) => {
     //   setLoading(true, "Refreshing images...");
     try {
-      const {list, date} = await (type === "LIST_TODAY" ? api.getImagesToday() : api.getImagesYesterday());
+      const { list, date } = await (type === "LIST_TODAY" ? api.getImagesToday() : api.getImagesYesterday());
 
       dispatch({ type, list, date });
     } catch (err) {
