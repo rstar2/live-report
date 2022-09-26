@@ -6,11 +6,16 @@ import * as api from "@/service/api";
 
 const ImagesContext = React.createContext<ImagesContextValue | undefined>(undefined);
 
-function createImagesContextValue(state: ImagesState, dispatch: React.Dispatch<ImagesAction>): ImagesContextValue {
+function createImagesContextValue(
+  state: ImagesState,
+  dispatch: React.Dispatch<ImagesAction>
+): ImagesContextValue {
   const refresh = async (type: ImagesActionType) => {
     //   setLoading(true, "Refreshing images...");
     try {
-      const { list, date } = await (type === "LIST_TODAY" ? api.getImagesToday() : api.getImagesYesterday());
+      const { list, date } = await (type === "LIST_TODAY"
+        ? api.getImagesToday()
+        : api.getImagesYesterday());
 
       dispatch({ type, list, date });
     } catch (err) {
@@ -37,7 +42,10 @@ export function ImagesContextProvider({ children }: { children: React.ReactNode 
 
   // NOTE: you *might* need to memoize this value
   // Learn more in http://kcd.im/optimize-context
-  const context = useMemo<ImagesContextValue>(() => createImagesContextValue(state, dispatch), [state, dispatch]);
+  const context = useMemo<ImagesContextValue>(
+    () => createImagesContextValue(state, dispatch),
+    [state, dispatch]
+  );
 
   return <ImagesContext.Provider value={context}>{children}</ImagesContext.Provider>;
 }

@@ -6,11 +6,16 @@ import * as api from "@/service/api";
 
 const VideosContext = React.createContext<VideosContextValue | undefined>(undefined);
 
-function createVideosContextValue(state: VideosState, dispatch: React.Dispatch<VideosAction>): VideosContextValue {
+function createVideosContextValue(
+  state: VideosState,
+  dispatch: React.Dispatch<VideosAction>
+): VideosContextValue {
   const refresh = async (type: VideosActionType) => {
     //   setLoading(true, "Refreshing videos...");
     try {
-      const { list, date } = await (type === "LIST_TODAY" ? api.getVideosToday() : api.getVideosYesterday());
+      const { list, date } = await (type === "LIST_TODAY"
+        ? api.getVideosToday()
+        : api.getVideosYesterday());
 
       dispatch({ type, list, date });
     } catch (err) {
@@ -37,7 +42,10 @@ export function VideosContextProvider({ children }: { children: React.ReactNode 
 
   // NOTE: you *might* need to memoize this value
   // Learn more in http://kcd.im/optimize-context
-  const context = useMemo<VideosContextValue>(() => createVideosContextValue(state, dispatch), [state, dispatch]);
+  const context = useMemo<VideosContextValue>(
+    () => createVideosContextValue(state, dispatch),
+    [state, dispatch]
+  );
 
   return <VideosContext.Provider value={context}>{children}</VideosContext.Provider>;
 }

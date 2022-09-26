@@ -4,6 +4,14 @@ import { sortByDate } from "utils/src";
 
 import { ImagesState, Image } from "@/types";
 
+// const demo: Image[] = Array.from({ length: 0 }).map((_, i) => {
+//   return {
+//     url: `https://placeimg.com/640/480/any?t=${Date.now() + i}`,
+//     name: `media-${i}`,
+//     date: new Date(),
+//   };
+// });
+
 const initState: ImagesState = {
   onceLoadedToday: false,
   onceLoadedYesterday: false,
@@ -15,6 +23,8 @@ const initState: ImagesState = {
   })(),
   today: [],
   yesterday: [],
+  //   today: demo,
+  //   yesterday: demo,
 };
 const reducer = (prevState: ImagesState, action: ImagesAction): ImagesState => {
   let keyList!: keyof ImagesState;
