@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { ThemeIcon, Image as Img, createStyles } from "@mantine/core";
+import { ThemeIcon, Image as Img, createStyles, Text, Box } from "@mantine/core";
 import { IconChevronLeft, IconChevronRight, TablerIcon } from "@tabler/icons";
 import useEmblaCarousel from "embla-carousel-react";
 
@@ -18,6 +18,10 @@ const numberWithinRange = (num: number, min: number, max: number) =>
   Math.min(Math.max(num, min), max);
 
 export default function Images({ list }: ImagesProps) {
+  return list.length ? <ImagesCarousel list={list} /> : <Text align="center">No images yet</Text>;
+}
+
+function ImagesCarousel({ list }: ImagesProps) {
   //   const { xsAndUp, mdAndUp, lgAndUp } = useBreakpoints();
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, skipSnaps: false });
@@ -84,12 +88,22 @@ export default function Images({ list }: ImagesProps) {
           <div className="embla__container">
             {list.map((image, index) => (
               <div className="embla__slide" key={index}>
-                <div
+                <Box
                   className="embla__slide__inner"
-                  style={{ transform: `scale(${scaleValues[index]})` }}
+                  sx={(theme) => ({
+                    transform: `scale(${scaleValues[index]})`,
+                    height: "520px",
+
+                    [`@media (max-width: ${theme.breakpoints.md}px)`]: {
+                      height: "460px",
+                    },
+                    [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
+                      height: "340px",
+                    },
+                  })}
                 >
                   <ImageItem image={image} />
-                </div>
+                </Box>
               </div>
             ))}
           </div>
@@ -123,8 +137,9 @@ function ImageItem({ image }: { image: Image }) {
       classNames={{ image: "embla__slide__img" }}
       styles={{
         root: { height: "100%" },
-        imageWrapper: { height: "100%" },
         figure: { height: "100%" },
+        imageWrapper: { height: "calc(100% - 30px)" },
+        caption: { marginTop: "15px" },
       }}
     />
     //   </Box>

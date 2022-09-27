@@ -1,6 +1,7 @@
 .embla {
     position: relative;
-    background-color: #f7f7f7;
+    /* background-color: #f7f7f7; */
+    background-color: transparent;
     padding: 20px;
     max-width: 670px;
     margin-left: auto;
@@ -39,7 +40,7 @@
   .embla__slide__inner {
     position: relative;
     overflow: hidden;
-    height: calc(480px + 40px);
+    /* height: 480px; */
   }
   
   .embla__slide__img {
@@ -56,9 +57,9 @@
   
   .embla__dots {
     display: flex;
-    list-style: none;
+    flex-wrap: wrap;
     justify-content: center;
-    padding-top: 10px;
+    margin-top: 10px;
   }
   
   .embla__dot {
