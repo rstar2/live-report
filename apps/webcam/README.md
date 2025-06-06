@@ -88,7 +88,8 @@ npm run test
 
 ## Run on "production"
 
-Use pm2 to run it, so inside the project folder run ```pm2 start --name live-report-webcam npm -- run start```
-
-Also can make it run on server startup (e.g as a service)
+- First build it with `npm run build`
+- NOTE: it's better to setup correct timezone in the device with `tzselect`
+- Use pm2 to run it, so inside the project folder run ```pm2 start --name live-report-webcam npm -- run start```
+- Also can make it run on server startup (e.g as a service)
 ```pm2 startup``` and use the script it outputs. Note all processed that are needed to be started on reboot (server startup) are necessary to be "saved", so do this with ```pm2 save```, e.g. the whole "pm2 list" is run as a service. Note a name can be set with ```pm2 startup --service-name <name>```

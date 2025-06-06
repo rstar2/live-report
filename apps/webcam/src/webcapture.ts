@@ -92,7 +92,7 @@ async function captureImage(imageName: string) {
     [imageName],
     {
       encoding: "utf-8",
-    }
+    },
   );
 
   if (log.isDebug())
@@ -118,10 +118,16 @@ async function read(path: string): Promise<Buffer> {
  * @param filePath the file path to the file to read
  * @return the file's data
  */
-async function upload(name: string, data: Buffer, uploadPutUrl: string, isVideo: boolean) {
+async function upload(
+  name: string,
+  data: Buffer,
+  uploadPutUrl: string,
+  isVideo: boolean,
+) {
   uploadPutUrl = formatString(uploadPutUrl, { name });
 
-  if (log.isDebug()) log.debug(`Upload ${isVideo ? "video" : "image"} ${name} to ${uploadPutUrl}`);
+  if (log.isDebug())
+    log.debug(`Upload ${isVideo ? "video" : "image"} ${name} to ${uploadPutUrl}`);
 
   putData(uploadPutUrl, data, {
     "Content-Type": isVideo ? "video/mpeg" : "image/jpeg",
@@ -136,7 +142,7 @@ async function tag(
   name: string,
   tagPutUrl: string,
   weatherReport?: WeatherReport,
-  isThumb = false
+  isThumb = false,
 ) {
   tagPutUrl = formatString(tagPutUrl, { name });
 
@@ -149,7 +155,8 @@ async function tag(
   }
 
   const data = formatTags(tags);
-  if (log.isDebug()) log.debug(`Tag ${name} with ${[...tags.keys()].join()} to ${tagPutUrl}`);
+  if (log.isDebug())
+    log.debug(`Tag ${name} with ${[...tags.keys()].join()} to ${tagPutUrl}`);
 
   // tag it as "snapshot" - this has to be done after some timeout in order to allow S3 to create the "resource"
   // otherwise executing it immediately after creation has no effect
@@ -213,9 +220,13 @@ async function captureVideo(videoName: string, duration?: string | number) {
 
   const args = [videoName];
   if (duration) args.push("" + duration);
-  const output = child_process.spawnSync(path.resolve(__dirname, "webcapture-video.sh"), args, {
-    encoding: "utf-8",
-  });
+  const output = child_process.spawnSync(
+    path.resolve(__dirname, "webcapture-video.sh"),
+    args,
+    {
+      encoding: "utf-8",
+    },
+  );
 
   if (log.isDebug())
     log.debug(`Finish video capture ${videoName} on ${new Date()}

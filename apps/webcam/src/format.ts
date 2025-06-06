@@ -7,7 +7,7 @@ export function formatTags(tags: Map<string, string>): string {
           `<Tag>
             <Key>${key}</Key>
             <Value>${value}</Value>
-        </Tag>`
+        </Tag>`,
       )
       .join("\n")}
    

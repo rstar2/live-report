@@ -7,7 +7,7 @@ import { WeatherReport, WEATHER_UNKNOWN } from "./types";
 // the max period the function is not touched and it would mean then that there's no electricity
 // technically it could be result from a lot of reasons (no electricity, no internet, hardware problem, software problem)
 export const MAX_NOT_TOUCHED_PERIOD = Number.parseInt(
-  process.env.MAX_NOT_TOUCHED_PERIOD || "" + 30 * 60 * 1000
+  process.env.MAX_NOT_TOUCHED_PERIOD || "" + 30 * 60 * 1000,
 ); // 30 mins by default
 
 export function formatWeather(weather: WeatherReport): string {
@@ -55,6 +55,9 @@ export function createNameForDate(date: Date) {
     .join("_");
 }
 
-export function formatString(placeholder: string, args: string[] | Record<string, string>): string {
+export function formatString(
+  placeholder: string,
+  args: string[] | Record<string, string>,
+): string {
   return stringInject(placeholder, args);
 }
