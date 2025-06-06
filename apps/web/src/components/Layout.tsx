@@ -13,7 +13,7 @@ function Layout({ children }: { children: React.ReactNode }) {
       theme={{
         // Override any other properties from default theme
         fontFamily: "Open Sans, sans serif",
-        spacing: { xs: 15, sm: 20, md: 25, lg: 30, xl: 40 },
+        // spacing: { xs: "1rem", sm: "1.2rem", md: "1.5rem", lg: "2rem", xl: "3rem" },
         colorScheme: dark ? "dark" : "light",
 
         // can be any color defined in theme.colors

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { ThemeIcon, Image as Img, createStyles, Text, Box } from "@mantine/core";
-import { IconChevronLeft, IconChevronRight, TablerIcon } from "@tabler/icons";
+import { IconChevronLeft, IconChevronRight, TablerIcon } from "@tabler/icons-react";
 import useEmblaCarousel from "embla-carousel-react";
 
 import { Image } from "@/types";
@@ -54,7 +54,7 @@ function ImagesCarousel({ list }: ImagesProps) {
 
       if (engine.options.loop) {
         engine.slideLooper.loopPoints.forEach((loopItem) => {
-          const target = loopItem.target().get();
+          const target = loopItem.target();
           if (index === loopItem.index && target !== 0) {
             const sign = Math.sign(target);
             if (sign === -1) diffToTarget = scrollSnap - (1 + scrollProgress);

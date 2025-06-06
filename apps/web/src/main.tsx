@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import "@/index.css";
 
@@ -15,12 +15,12 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ContextProvider>
       <Router>
-        <Switch>
+        <Routes>
           {routes.map(({ path, component: Component = React.Fragment }, index) => (
-            <Route key={index} path={path} component={Component} exact={true} />
+            <Route key={index} path={path} element={<Component />} />
           ))}
-        </Switch>
+        </Routes>
       </Router>
     </ContextProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

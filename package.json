@@ -13,12 +13,12 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "prettier": "^2.6.2",
+    "prettier": "^3.5.3",
     "turbo": "latest"
   },
   "engines": {
-    "npm": ">=7.0.0",
-    "node": ">=14.0.0"
+    "npm": ">=10.0.0",
+    "node": ">=20.0.0"
   },
-  "packageManager": "npm@8.6.0"
+  "packageManager": "npm@10.5.2"
 }

@@ -1,7 +1,17 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 
-import { Anchor, AppShell, Navbar, Header, Footer, Text, MediaQuery, Burger, useMantineTheme } from "@mantine/core";
+import {
+  Anchor,
+  AppShell,
+  Navbar,
+  Header,
+  Footer,
+  Text,
+  MediaQuery,
+  Burger,
+  useMantineTheme,
+} from "@mantine/core";
 
 import { createTo } from "@/routes";
 

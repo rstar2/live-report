@@ -1,11 +1,11 @@
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import NotFound from "@/components/NotFound";
 
 // https://omarelhawary.me/blog/file-based-routing-with-react-router-code-splitting
 // For dynamic imports can be used import.meta.glob(...) and React.Lazy and React.Suspense
 
 // for more advance pre-loading https://omarelhawary.me/blog/file-based-routing-with-react-router-pre-loading
-const ROUTES = import.meta.globEager("/src/pages/**/[a-z[]*.tsx");
+const ROUTES = import.meta.glob("/src/pages/**/[a-z[]*.tsx", { eager: true });
 // ROUTES = {
 //     '/src/pages/index.tsx': { default: ƒ Index(), ... },
 //     '/src/pages/posts/index.tsx': { default: ƒ PostsIndex(), ... },
@@ -24,7 +24,7 @@ const routes = Object.keys(ROUTES).map((route) => {
   // remove the / and prepend the baseUrl
   if (baseUrl !== "/") path = baseUrl + path.substring(1);
 
-  return { path, component: ROUTES[route].default };
+  return { path, component: (ROUTES[route] as any).default as React.FC };
 });
 // routes = [
 //     { path: '/', component: ƒ Index() },
@@ -39,10 +39,11 @@ routes.push(
     path: baseUrl,
     component() {
       return (
-        <Redirect
+        <Navigate
           to={{
             pathname: baseUrl + "today",
           }}
+          replace
         />
       );
     },
@@ -52,7 +53,7 @@ routes.push(
   {
     path: "*",
     component: NotFound,
-  }
+  },
 );
 
 const createTo = (to: string): string => {
