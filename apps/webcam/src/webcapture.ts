@@ -22,8 +22,8 @@ cron.schedule(SIMPLE_NOTIFY_CRON, () => {
 });
 
 // implement image capturing
-const IMAGE_CAPTURE_CRON = "* * * * *"; // every minute - for testing only
-// const IMAGE_CAPTURE_CRON = "0,30 7-19 * * *"; // every half hour from 7 to 19
+// const IMAGE_CAPTURE_CRON = "* * * * *"; // every minute - for testing only
+const IMAGE_CAPTURE_CRON = "0,30 7-19 * * *"; // every half hour from 7 to 19
 // reuse same image
 const IMAGE_NAME = "image.jpg";
 // these are protected by dotenv-safe
