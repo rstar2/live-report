@@ -138,7 +138,7 @@ function ImageItem({ image }: { image: Image }) {
       styles={{
         root: { height: "100%" },
         figure: { height: "100%" },
-        imageWrapper: { height: "calc(100% - 30px)" },
+        imageWrapper: { height: "calc(100% - 32px)" },
         caption: { marginTop: "15px" },
       }}
     />

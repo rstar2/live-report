@@ -36,7 +36,7 @@ cron.schedule(IMAGE_CAPTURE_CRON, taskImage);
 
 // implement video capturing
 // const VIDEO_CAPTURE_CRON = "* * * * *"; // every minute - for testing only
-const VIDEO_CAPTURE_CRON = "15 7,11,15,19 * * *"; // every 7,11,15,19 hours
+const VIDEO_CAPTURE_CRON = "15 7,11,15,19 * * *"; // 15 mins after the 7,11,15,19 hours
 const VIDEO_NAME = "video.mp4";
 // these are protected by dotenv-safe
 const URL_UPLOAD_VIDEO = process.env.URL_UPLOAD_VIDEO!;
@@ -44,8 +44,8 @@ const URL_TAG_VIDEO = process.env.URL_TAG_VIDEO!;
 const VIDEO_DURATION = process.env.VIDEO_DURATION || undefined;
 
 // schedule image capturing
-if (log.isDebug()) log.debug(`Schedule video capturing task for ${VIDEO_CAPTURE_CRON}`);
-cron.schedule(VIDEO_CAPTURE_CRON, taskVideo);
+// if (log.isDebug()) log.debug(`Schedule video capturing task for ${VIDEO_CAPTURE_CRON}`);
+// cron.schedule(VIDEO_CAPTURE_CRON, taskVideo);
 
 /**
  * The cron task - the main "worker".
