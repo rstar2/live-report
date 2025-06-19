@@ -3,7 +3,7 @@
 ### Deployment
 
 ```bash
-$ serverless deploy
+$ npm run deploy
 ```
 
 After running deploy, you should see output similar to:

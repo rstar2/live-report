@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "sls offline -s development",
-    "build": "sls deploy -s development",
+    "deploy": "sls deploy -s development",
     "start": "NEST_GLOBAL_PREFIX=/development ts-node src/functions/nestjs/server/main.ts",
     "nest:start": "nest start",
     "nest:start:dev": "nest start --watch",
     "nest:start:debug": "nest start --debug --watch",
+    "nest:start:build": "nest build",
     "nest:start:prod": "node dist/main",
     "test": "jest",
     "test:watch": "jest --watch",

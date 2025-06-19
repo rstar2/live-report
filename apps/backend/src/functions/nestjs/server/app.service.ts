@@ -46,7 +46,10 @@ const ensureEndsWith = (str: string, end = "/"): string => {
   return str.endsWith(end) ? str : `${str}${end}`;
 };
 
-const list = async (params: ListObjectsV2CommandInput, accum: string[] = []): Promise<string[]> => {
+const list = async (
+  params: ListObjectsV2CommandInput,
+  accum: string[] = [],
+): Promise<string[]> => {
   return await S3.send(new ListObjectsV2Command(params)).then((data) => {
     console.log(data);
     if (data.Contents) {
@@ -115,7 +118,7 @@ export class AppService {
       new GetObjectCommand({
         ...paramsGet,
         Key,
-      })
+      }),
     );
     return response.Body!;
   }
@@ -129,13 +132,16 @@ export class AppService {
       new GetObjectTaggingCommand({
         ...paramsGet,
         Key,
-      })
+      }),
     );
     if (!response.TagSet) return {};
 
-    return response.TagSet.reduce((res, { Key, Value }) => {
-      res[Key!] = Value ?? "";
-      return res;
-    }, {} as Record<string, string>);
+    return response.TagSet.reduce(
+      (res, { Key, Value }) => {
+        res[Key!] = Value ?? "";
+        return res;
+      },
+      {} as Record<string, string>,
+    );
   }
 }

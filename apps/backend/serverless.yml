@@ -28,9 +28,9 @@ plugins:
   # other options are serverless-webpack or serverless-bundle that produce a single file
   # https://github.com/AnomalyInnovations/serverless-typescript-starter
   - serverless-plugin-include-dependencies
-  # customize the log retantion for all or individual functions
+  # customize the log retention for all or individual functions
   - serverless-plugin-log-retention
-  # plugin for assigning additioanl roles per function
+  # plugin for assigning additional roles per function
   - serverless-iam-roles-per-function
 
 useDotenv: true  
@@ -39,7 +39,7 @@ provider:
   name: aws
   profile: serverless-cli
 
-  runtime: nodejs14.x
+  runtime: nodejs20.x
 
   region: eu-west-1
   stage: development
@@ -49,7 +49,7 @@ provider:
     # same as 
     # NODE_ENV: ${self:provider.stage}
 
-    # the whole .env.xxx files are packed so use 'dotenv' inside each function to load itthe one it needs
+    # the whole .env.xxx files are packed so use 'dotenv' inside each function to load the one it needs
     # only the NODE_ENV is obligatory
     # UPLOAD_BUCKET: ${self:custom.uploadBucket}
     # UPLOAD_BUCKET_GATEWAY_URL: ${self:custom.uploadBucketGatewayUrl}
@@ -57,7 +57,7 @@ provider:
 
   # logs:
   #   # Enable REST API logs
-  #   # This can either be set to `restApi: true` to use defaults, or configured via subproperties
+  #   # This can either be set to `restApi: true` to use defaults, or configured via sub-properties
   #   # Can only be configured if the API is created by Serverless Framework
   #   restApi:
   #     # Enables HTTP access logs (default: true)
@@ -129,7 +129,7 @@ functions:
     # defined additional role/permissions for this function
     iamRoleStatementsInherit: true
     iamRoleStatements:
-    # all the Lambda Function(s) to access the specific S3 Bucket (only read permimssions)
+    # all the Lambda Function(s) to access the specific S3 Bucket (only read permissions)
     - Effect: "Allow"
       Action:
         - "s3:List*"
@@ -142,10 +142,10 @@ functions:
       Resource: ${self:custom.uploadBucketArn}/*
 
 
-# NOTE!  I could not create the ApiGateway dynamimcally to be integrsated to the bucket
-#        so will create the Policy, Role, S3Bucket, ApiGateway explictly from the AWS Console.
+# NOTE!  I could not create the ApiGateway dynamically to be integrated to the bucket
+#        so will create the Policy, Role, S3Bucket, ApiGateway explicitly from the AWS Console.
 #        The Role (with the Policy) is used to allow the ApiGateway to put objects to the S3Bucket
-# NOTE!! After adding/removeing/updating any Resource/Method in the ApiGateway
+# NOTE!! After adding/removing/updating any Resource/Method in the ApiGateway
 #        then in order to take effect it has to be (re)deployed (.g. click Actions->DeployAPI->Save)
 # Some simple example in https://bluegrid.io/using-rest-api-to-upload-files-to-the-s3-bucket/
 
