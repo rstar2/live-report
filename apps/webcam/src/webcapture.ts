@@ -22,8 +22,8 @@ cron.schedule(SIMPLE_NOTIFY_CRON, () => {
 });
 
 // implement image capturing
-// const IMAGE_CAPTURE_CRON = "* * * * *"; // every minute - for testing only
-const IMAGE_CAPTURE_CRON = "0,30 7-19 * * *"; // every half hour from 7 to 19
+const IMAGE_CAPTURE_CRON = "* * * * *"; // every minute - for testing only
+// const IMAGE_CAPTURE_CRON = "0,30 7-19 * * *"; // every half hour from 7 to 19
 // reuse same image
 const IMAGE_NAME = "image.jpg";
 // these are protected by dotenv-safe
@@ -51,9 +51,10 @@ const VIDEO_DURATION = process.env.VIDEO_DURATION || undefined;
  * The cron task - the main "worker".
  */
 async function taskImage() {
+  let imagePath;
   try {
     // take/capture a new image
-    const imagePath = await captureImage(IMAGE_NAME);
+    imagePath = await captureImage(IMAGE_NAME);
 
     // read the file as data
     const imageBuffer = await read(imagePath);
@@ -66,15 +67,19 @@ async function taskImage() {
     // analyze
     const weatherReport = await analyze(imageBuffer);
 
-    // notify
-    notify.newImage(imageName, weatherReport);
-
     // tag it as snapshot and with analyzed weather
-    tag(imageName, URL_TAG_IMAGE, weatherReport);
+    await tag(imageName, URL_TAG_IMAGE, weatherReport);
 
-    thumb(imageName, imageBuffer);
+    await thumb(imageName, imageBuffer);
+
+    // notify
   } catch (error: unknown) {
     log.warn(`Failed image capture with ${error}`);
+  } finally {
+    if (imagePath) {
+      if (log.isDebug()) log.debug(`Delete file ${imagePath}`);
+      await fs.unlink(imagePath);
+    }
   }
 }
 
@@ -87,7 +92,7 @@ async function captureImage(imageName: string) {
   // capture and write to a file
   if (log.isDebug()) log.debug(`Start image capture ${imageName} on ${new Date()}`);
 
-  const output = child_process.spawnSync(
+  const output = child_process.execFileSync(
     path.resolve(__dirname, "webcapture-image.sh"),
     [imageName],
     {
@@ -98,9 +103,11 @@ async function captureImage(imageName: string) {
   if (log.isDebug())
     log.debug(`Finish image capture ${imageName} on ${new Date()}
 Output:
-${output.stderr}`);
+${output}`);
 
-  return path.resolve(process.cwd(), imageName);
+  const imagePath = path.resolve(process.cwd(), imageName);
+  await fs.access(imagePath);
+  return imagePath;
 }
 
 /**
@@ -109,8 +116,10 @@ ${output.stderr}`);
  * @return the file's data
  */
 async function read(path: string): Promise<Buffer> {
-  if (log.isDebug()) log.debug(`Read file ${path}`);
-  return fs.readFile(path);
+  if (log.isDebug()) log.debug(`Start read file ${path}`);
+  const pr = fs.readFile(path);
+  if (log.isDebug()) log.debug(`Finish read file ${path}`);
+  return pr;
 }
 
 /**

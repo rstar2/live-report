@@ -5,13 +5,17 @@ IMAGE=$1
 RESOLUTION_DEF=1920x1280
 RESOLUTION=${2:-$RESOLUTION_DEF}
 
+# delete current image
+rm $IMAGE
+
 # take just one image
-# ffmpeg -f v4l2 -i /dev/video0 -f singlejpeg -frames:v 1 -qscale:v $1
+# ffmpeg -f v4l2 -i /dev/video0 -video_size $RESOLUTION -f singlejpeg -frames:v 1 -qscale:v $1
+ffmpeg -v debug -f v4l2 -input_format mjpeg -i /dev/video0 -video_size $RESOLUTION -frames:v 1 -update 1 -y $1
 
 # use fswebcam  (delay 2 secs and skip first 2 frames) - save it as the passed 1-st argument
 # fswebcam --device v4l2:/dev/video0 --delay 2 --skip 2 --frames 1 ./public/history/image.jpg
 # NOTE: The output image is overwritten (this is useful in this case)
-fswebcam --device v4l2:/dev/video0 --delay 2 --skip 2 --frames 1 --resolution $RESOLUTION $IMAGE
+# fswebcam -v debug --device v4l2:/dev/video0 --delay 2 --skip 2 --frames 1 --resolution $RESOLUTION $IMAGE
 
 
 # for knowage: The  PNG or JPEG image can be sent to stdio using the filename "-".

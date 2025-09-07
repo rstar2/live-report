@@ -46,7 +46,7 @@ export const handler: Handler = async (event, _context) => {
       try {
         data = JSON.parse(event);
         type = data.type;
-      } catch (err) {
+      } catch {
         // this means it is coming from an HTTP request
         data = JSON.parse(event.body);
         type = data.type;

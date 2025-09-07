@@ -33,5 +33,7 @@ export default function (subject: string, message: string, to = receiver): Promi
   return SES.sendEmail(emailParams)
     .promise()
     .then(() => undefined)
-    .catch((error) => console.error(`Failed to send email from ${sender} to ${to}: ${error}`));
+    .catch((error) =>
+      console.error(`Failed to send email from ${sender} to ${to}: ${error}`),
+    );
 }

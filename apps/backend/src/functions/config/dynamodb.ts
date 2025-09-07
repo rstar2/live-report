@@ -99,7 +99,9 @@ function markReported() {
     },
   };
 
-  return dynamoDb.send(new UpdateItemCommand(params)).catch((error) => console.error(error));
+  return dynamoDb
+    .send(new UpdateItemCommand(params))
+    .catch((error) => console.error(error));
 }
 
 /**
